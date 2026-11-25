@@ -15441,6 +15441,147 @@ function createMusicPeopleEmptyState(hasPublicRows = true) {
   return empty;
 }
 
+let musicPeopleLoadingPresentation = null;
+
+function clearMusicPeopleLoadingPresentation() {
+  const current = musicPeopleLoadingPresentation;
+  if (!current) return;
+  musicPeopleLoadingPresentation = null;
+  cancelAnimationFrame(current.frame);
+  current.resize?.disconnect();
+  current.owner?.disconnect();
+  current.cleanup.forEach(remove => remove());
+  current.animations.forEach(animation => animation.cancel());
+  current.layer.remove();
+  delete musicPeopleIndex.dataset.peopleLoading;
+  const filters = musicPeopleIndex.querySelector("[data-music-people-filters]");
+  if (filters) filters.inert = false;
+}
+
+function createMusicPeopleLoadingMotif() {
+  const layer = document.createElement("div");
+  layer.className = "music-people-loading";
+  layer.dataset.musicPeopleLoading = "";
+  layer.setAttribute("role", "status");
+  layer.setAttribute("aria-live", "polite");
+  const motif = document.createElement("div");
+  motif.className = "music-people-loading-motif";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 160 140");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  svg.innerHTML = '<circle cx="80" cy="0" r="1.6" fill="#e1bd7e"/>'
+    + '<path class="music-people-loading-fork" d="M80 4V20M80 20L64 28M80 20L96 28M64 28V58Q64 72 80 72Q96 72 96 58V28M80 72V87" fill="none" stroke="#d9be98" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<g class="music-people-loading-note"><path d="M81 109V87" fill="none" stroke="#d6b0e1" stroke-width="2.5" stroke-linecap="round"/>'
+    + '<ellipse cx="73" cy="111" rx="8.5" ry="5.7" transform="rotate(-20 73 111)" fill="#d6b0e1"/></g>'
+    + '<g class="music-people-loading-resonance" fill="none" stroke="#c5a2d6" stroke-width="1" stroke-linecap="round">'
+    + '<g class="music-people-loading-wave music-people-loading-wave--left"><path d="M54 99Q44 108 54 117M43 94Q27 108 43 122"/></g>'
+    + '<g class="music-people-loading-wave music-people-loading-wave--right"><path d="M104 99Q114 108 104 117M115 94Q131 108 115 122"/></g>'
+    + '</g>';
+  const title = document.createElement("h3");
+  title.textContent = "Tuning the Chorus";
+  const copy = document.createElement("p");
+  copy.textContent = "Establishing resonance";
+  motif.append(svg, title, copy);
+  layer.appendChild(motif);
+  return layer;
+}
+
+function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
+  const current = musicPeopleLoadingPresentation;
+  const sameOwner = current?.context === v3RouteContext;
+  if (!isLoading) {
+    if (!current) return;
+    const filters = musicPeopleIndex.querySelector("[data-music-people-filters]");
+    if (filters) filters.inert = false;
+    if (current.phase === "leaving" && sameOwner && hasContent) return;
+    if (!sameOwner || !hasContent || reducedMotion.matches || !current.painted
+      || getRouteFromUrl().name !== "music-people" || !current.layer.isConnected
+      || typeof current.layer.animate !== "function" || typeof musicPeopleList.animate !== "function") {
+      clearMusicPeopleLoadingPresentation();
+      return;
+    }
+    current.phase = "leaving";
+    musicPeopleIndex.dataset.peopleLoading = "leaving";
+    current.layer.setAttribute("aria-hidden", "true");
+    current.layer.removeAttribute("role");
+    current.layer.removeAttribute("aria-live");
+    try {
+      current.animations.push(current.layer.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: "ease-out", fill: "both" }));
+      current.animations.push(musicPeopleList.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: "ease-out", fill: "both" }));
+      Promise.all(current.animations.map(animation => animation.finished)).then(() => {
+        if (musicPeopleLoadingPresentation === current) clearMusicPeopleLoadingPresentation();
+      }, () => {
+        if (musicPeopleLoadingPresentation === current) clearMusicPeopleLoadingPresentation();
+      });
+    } catch { clearMusicPeopleLoadingPresentation(); }
+    return;
+  }
+  if (v3RouteContext.route?.name !== "music-people") { clearMusicPeopleLoadingPresentation(); return; }
+  if (current && (!sameOwner || current.phase !== "loading")) clearMusicPeopleLoadingPresentation();
+  if (!musicPeopleLoadingPresentation) {
+    const layer = createMusicPeopleLoadingMotif();
+    const state = { layer, context: v3RouteContext, phase: "loading", painted: false, frame: 0, cleanup: [], animations: [] };
+    musicPeopleLoadingPresentation = state;
+    musicPeopleIndex.appendChild(layer);
+    const ownsView = () => musicPeopleLoadingPresentation === state && v3RouteContext === state.context
+      && v3RouteContext.route?.name === "music-people" && musicPeopleIndex.classList.contains("is-active")
+      && musicPeopleIndex.getAttribute("aria-hidden") !== "true"
+      && musicNexusShell?.getAttribute("aria-hidden") !== "true" && !musicNexusShell?.hasAttribute("inert");
+    const schedulePaint = () => {
+      if (state.painted || state.frame || state.phase !== "loading") return;
+      state.frame = requestAnimationFrame(() => {
+        state.frame = 0;
+        if (musicPeopleLoadingPresentation !== state || state.phase !== "loading") return;
+        state.frame = requestAnimationFrame(() => {
+          state.frame = 0;
+          if (ownsView() && getRouteFromUrl().name === "music-people" && !document.hidden && !shell.inert
+            && !document.documentElement.hasAttribute("data-v3-booting")) state.painted = true;
+        });
+      });
+    };
+    const position = () => {
+      if (musicPeopleLoadingPresentation !== state) return;
+      const environment = shell.getBoundingClientRect();
+      const index = musicPeopleIndex.getBoundingClientRect();
+      if (environment.width && environment.height && index.width) {
+        const scale = Math.max(environment.width / 1672, environment.height / 941);
+        layer.style.setProperty("--melody-source-x", environment.left + (environment.width - 1672 * scale) / 2 + 835 * scale - index.left + "px");
+        layer.style.setProperty("--melody-source-y", environment.top + (environment.height - 941 * scale) / 2 + 275 * scale - index.top + "px");
+      }
+      schedulePaint();
+    };
+    if (typeof ResizeObserver === "function") {
+      state.resize = new ResizeObserver(position);
+      state.resize.observe(shell);
+      state.resize.observe(musicPeopleIndex);
+    } else {
+      window.addEventListener("resize", position);
+      state.cleanup.push(() => window.removeEventListener("resize", position));
+    }
+    if (typeof MutationObserver === "function") {
+      state.owner = new MutationObserver(() => {
+        if (musicPeopleLoadingPresentation !== state) return;
+        if (!ownsView()) clearMusicPeopleLoadingPresentation();
+        else position();
+      });
+      for (let node = musicPeopleIndex; node; node = node.parentElement) {
+        state.owner.observe(node, { attributes: true, attributeFilter: ["class", "aria-hidden", "inert", "data-shell-route", "data-v3-booting"] });
+      }
+    }
+    const onMotion = () => {
+      if (reducedMotion.matches && state.phase === "leaving" && musicPeopleLoadingPresentation === state) clearMusicPeopleLoadingPresentation();
+    };
+    reducedMotion.addEventListener?.("change", onMotion);
+    state.cleanup.push(() => reducedMotion.removeEventListener?.("change", onMotion));
+    position();
+  }
+  musicPeopleIndex.dataset.peopleLoading = "loading";
+  setMusicPeopleTuningOpen(false);
+  const filters = musicPeopleIndex.querySelector("[data-music-people-filters]");
+  if (filters) filters.inert = true;
+}
+
 function renderMusicPeopleIndex(options = {}) {
   if (!musicPeopleList) {
     return;
@@ -15467,12 +15608,13 @@ function renderMusicPeopleIndex(options = {}) {
   const dataState = musicPeopleIndexDataState || musicPeopleIndex?.dataset.peopleDataState || "idle";
   const filteredRows = getFilteredMusicPeopleRows();
   const numberedRows = getMusicPeopleRowsWithCategoryNumbers(filteredRows);
+  const isLoading = forcedState === "loading" || ((!forcedState || forcedState === "partial") && dataState === "loading" && !musicPeopleIndexLoaded);
   const fragment = document.createDocumentFragment();
   if (musicPeoplePresentationMode === "directory") fragment.append(createMusicPeopleDirectoryHeader());
-  if (forcedState && forcedState !== "partial") {
+  if (isLoading) {
+    // The native status motif is owned by the positioned index, outside live scroll content.
+  } else if (forcedState && forcedState !== "partial") {
     fragment.append(createMusicV3StateCard(forcedState, "musicPeople"));
-  } else if (dataState === "loading" && !musicPeopleIndexLoaded) {
-    fragment.append(createMusicV3StateCard("loading", "musicPeople"));
   } else if (dataState === "error" && numberedRows.length === 0) {
     fragment.append(createMusicV3StateCard("error", "musicPeople", { retry: true }));
   } else {
@@ -15498,6 +15640,7 @@ function renderMusicPeopleIndex(options = {}) {
   musicPeopleIndex.dataset.peoplePresentation = musicPeoplePresentationMode;
   syncMusicPeopleSignatureMotion();
   startMusicPeopleEchoes();
+  syncMusicPeopleLoadingPresentation(isLoading, !isLoading && numberedRows.length > 0 && (!forcedState || forcedState === "partial"));
   if (restorePresentation) musicPeopleList.scrollTo({ top: musicPeoplePresentationScroll[musicPeoplePresentationMode], behavior: "instant" });
   restoreMusicPeopleFilterFocus(focusMeta);
 
@@ -19379,6 +19522,7 @@ function setPeopleIndexVisible(isVisible) {
   if (!isVisible) {
     setMusicPeopleTuningOpen(false);
     stopMusicPeopleEchoes();
+    clearMusicPeopleLoadingPresentation();
   }
   if (isVisible) {
     const peopleRequest = requestMusicPeopleIndexData();

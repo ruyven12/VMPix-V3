@@ -35683,3 +35683,29 @@ button.hall-crusades-archive-crystal:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .venue-photo-highlight-thumbnail img.is-venue-photo-ready { opacity: 1 !important; }
 }
+
+/* Melody-native pending identity, anchored to the existing artwork source. */
+.music-people-index[data-people-loading="loading"] :is(.music-people-filters, .music-people-directory-header) { visibility: hidden; }
+.music-people-index .music-people-loading { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.music-people-index .music-people-loading-motif {
+  position: absolute; inset-inline-start: var(--melody-source-x, 50%); inset-block-start: var(--melody-source-y, 28%);
+  transform: translateX(-50%); display: flex; flex-direction: column; align-items: center;
+  inline-size: min(19rem, calc(100% - 1.5rem)); text-align: center;
+}
+.music-people-index .music-people-loading-motif svg { display: block; inline-size: clamp(7rem, 20vw, 10rem); block-size: auto; overflow: visible; }
+.music-people-index .music-people-loading-motif h3 { margin: .1rem 0 .35rem; color: #ead9ed; font: inherit; font-size: 1.08rem; font-weight: 500; line-height: 1.3; text-shadow: 0 1px 2px #09050e; }
+.music-people-index .music-people-loading-motif p { margin: 0; color: #cbb8cf; font: inherit; font-size: .875rem; line-height: 1.4; text-shadow: 0 1px 2px #09050e; }
+.music-people-index .music-people-loading-fork { animation: musicPeopleLoadingMaterialize 180ms ease-out both; }
+.music-people-index .music-people-loading-note { animation: musicPeopleLoadingMaterialize 240ms ease-out 90ms both; }
+.music-people-index .music-people-loading-wave { opacity: 0; animation: musicPeopleLoadingWaveLeft 2.6s ease-out 180ms infinite; }
+.music-people-index .music-people-loading-wave--right { animation-name: musicPeopleLoadingWaveRight; }
+@keyframes musicPeopleLoadingMaterialize { from { opacity: 0; } to { opacity: 1; } }
+@keyframes musicPeopleLoadingWaveLeft { 0% { opacity: 0; transform: translateX(0); } 18% { opacity: .35; } 100% { opacity: 0; transform: translateX(-3px); } }
+@keyframes musicPeopleLoadingWaveRight { 0% { opacity: 0; transform: translateX(0); } 18% { opacity: .35; } 100% { opacity: 0; transform: translateX(3px); } }
+[inert] .music-people-loading :is(.music-people-loading-fork, .music-people-loading-note, .music-people-loading-wave),
+html[data-v3-booting] .music-people-loading :is(.music-people-loading-fork, .music-people-loading-note, .music-people-loading-wave),
+.music-people-index:not(.is-active) .music-people-loading :is(.music-people-loading-fork, .music-people-loading-note, .music-people-loading-wave) { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .music-people-index .music-people-loading :is(.music-people-loading-fork, .music-people-loading-note, .music-people-loading-wave) { animation: none; opacity: 1; transform: none; }
+  .music-people-index .music-people-loading .music-people-loading-wave { opacity: .35; }
+}
