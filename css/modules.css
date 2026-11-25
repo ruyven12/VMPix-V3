@@ -35642,10 +35642,12 @@ button.hall-crusades-archive-crystal:focus-visible {
 .music-people-index .music-people-staff-lane::before {
   content: ""; position: absolute; inset-inline: 0; inset-block-start: calc(50% - 2rem); block-size: 37px;
   background: repeating-linear-gradient(to bottom, rgba(225,197,150,.19) 0 1px, transparent 1px 9px); pointer-events: none;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
 .music-people-index .music-people-echo-transit { position: absolute; inset-inline-start: 0; inset-block-start: 50%; }
 .music-people-index .music-people-staff .music-people-echo {
-  position: relative; inset: auto; inline-size: 100%; max-inline-size: 100%; transform: none; margin: 0;
+  position: relative; inset: auto; inline-size: 100%; max-inline-size: 100%; transform: translateY(var(--echo-pitch-y, 0px)); margin: 0;
   display: flex; min-block-size: 44px;
 }
 .music-people-index .music-people-echoes-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4rem 1rem; }

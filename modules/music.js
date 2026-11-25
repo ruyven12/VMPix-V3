@@ -14994,6 +14994,7 @@ function createMusicPeopleEchoToken(record, slotIndex) {
   echo.dataset.echoPersonKey = record.key;
   echo.setAttribute("aria-label", person.name);
   echo.style.setProperty("--echo-depth", String(descriptor.id ? .9 + ((descriptor.seed >>> 12) % 23) / 100 : 1));
+  echo.style.setProperty("--echo-pitch-y", `${descriptor.id ? ((descriptor.seed >>> 16) % 5 - 2) * 4.5 : 0}px`);
   const name = document.createElement("span");
   name.className = "music-people-echo-name";
   name.textContent = person.name;
