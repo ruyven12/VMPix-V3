@@ -35712,3 +35712,11 @@ html[data-v3-booting] .music-people-loading :is(.music-people-loading-motif, .mu
   .music-people-index .music-people-loading-motif { animation: none; opacity: 1; }
   .music-people-index .music-people-loading .music-people-loading-wave { opacity: .35; }
 }
+
+/* Living Score only: note paint enters/leaves the staff independently of its motion owners. */
+.music-people-index .music-people-staff .music-people-note svg { opacity: var(--echo-note-opacity, 1); }
+.music-people-index [data-echo-mode="static"] .music-people-staff .music-people-note svg { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .music-people-index .music-people-staff .music-people-note svg { opacity: 1; }
+  .music-people-index .music-people-staff [data-echo-note-shimmer] { display: none; }
+}

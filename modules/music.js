@@ -14984,6 +14984,46 @@ function getMusicPeopleEchoVisit(rows) {
   return { visit, pool: visit.order.map(key => byKey.get(key)).filter(Boolean) };
 }
 
+let musicPeopleEchoNoteSequence = 0;
+
+// Score-only paint layers: the persistent glyph remains unchanged beneath a masked sweep.
+function createMusicPeopleEchoNote(descriptor) {
+  const note = createMusicPeopleSignature(descriptor);
+  const svg = note.querySelector("svg");
+  const instance = ++musicPeopleEchoNoteSequence;
+  const prefix = `melody-echo-note-${instance}`;
+  const add = (tag, attributes, parent) => {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.entries(attributes).forEach(([key, value]) => node.setAttribute(key, String(value)));
+    parent.appendChild(node);
+    return node;
+  };
+  const glyph = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  glyph.id = `${prefix}-glyph`;
+  glyph.dataset.echoNoteGlyph = "";
+  while (svg.firstChild) glyph.appendChild(svg.firstChild);
+  const definitions = add("defs", {}, svg);
+  const gradient = add("linearGradient", { id: `${prefix}-light`, x1: "0%", y1: "0%", x2: "100%", y2: "0%" }, definitions);
+  [[0, 0], [50, 1], [100, 0]].forEach(([offset, opacity]) => add("stop", { offset: `${offset}%`, "stop-color": "#fff", "stop-opacity": opacity }, gradient));
+  const mask = add("mask", { id: `${prefix}-mask`, maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 64, height: 64, "mask-type": "alpha" }, definitions);
+  add("use", { href: `#${prefix}-glyph` }, mask);
+  svg.appendChild(glyph);
+  const shimmer = add("g", { mask: `url(#${prefix}-mask)`, opacity: 0, "data-echo-note-shimmer": "" }, svg);
+  const band = add("rect", { x: -16, y: 0, width: 32, height: 64, fill: `url(#${prefix}-light)`, transform: "translate(-16 0)" }, shimmer);
+  svg.dataset.echoNote = "";
+  svg.style.setProperty("--echo-note-opacity", "0");
+  let visualSeed = (descriptor.seed ^ Math.imul(instance, 2654435761) ^ (performance.now() * 1000)) >>> 0 || 1;
+  const random = () => {
+    visualSeed ^= visualSeed << 13;
+    visualSeed ^= visualSeed >>> 17;
+    visualSeed ^= visualSeed << 5;
+    return (visualSeed >>> 0) / 4294967296;
+  };
+  note._echoNoteEffect = { svg, shimmer, band, random, wait: 7000 + random() * 8000,
+    sweep: -1, duration: 1000, lastTime: 0, alpha: 0 };
+  return note;
+}
+
 function createMusicPeopleEchoToken(record, slotIndex) {
   const { person, descriptor, index } = record;
   const echo = document.createElement("button");
@@ -15002,7 +15042,9 @@ function createMusicPeopleEchoToken(record, slotIndex) {
     echo.dataset.echoNameMotion = "caption";
     name.style.setProperty("--echo-name-index", "0");
   }
-  echo.append(createMusicPeopleSignature(descriptor), name);
+  const note = createMusicPeopleEchoNote(descriptor);
+  echo._echoNoteEffect = note._echoNoteEffect;
+  echo.append(note, name);
   echo.addEventListener("click", () => {
     setActiveMusicPeopleRow(person.personId);
     navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
@@ -15056,7 +15098,14 @@ function startMusicPeopleEchoes() {
     node.addEventListener(type, handler, options);
     cleanup.push(() => node.removeEventListener(type, handler, options));
   };
+  const pauseNoteEffect = slot => {
+    const effect = slot.button?._echoNoteEffect;
+    if (!effect) return;
+    effect.lastTime = 0;
+  };
   const unwatch = slot => {
+    pauseNoteEffect(slot);
+    slot.button?._echoNoteEffect?.shimmer.setAttribute("opacity", "0");
     const note = slot.button?.querySelector("[data-signature-id]");
     if (note) musicPeopleSignatureObserver?.unobserve(note);
   };
@@ -15159,15 +15208,57 @@ function startMusicPeopleEchoes() {
     }, () => {});
     setAccessible(slot, false);
   };
+  const updateNoteEffect = (lane, slot, viewport, now) => {
+    const effect = slot.button?._echoNoteEffect;
+    if (!effect) return;
+    const bounds = effect.svg.getBoundingClientRect();
+    const staff = lane.node.getBoundingClientRect();
+    const left = Math.max(viewport.left + musicPeopleList.clientLeft, staff.left);
+    const right = Math.min(viewport.left + musicPeopleList.clientLeft + musicPeopleList.clientWidth, staff.right);
+    const top = Math.max(viewport.top + musicPeopleList.clientTop, staff.top);
+    const bottom = Math.min(viewport.top + musicPeopleList.clientTop + musicPeopleList.clientHeight, staff.bottom);
+    const overlapX = Math.max(0, Math.min(bounds.right, right) - Math.max(bounds.left, left));
+    const overlapY = Math.max(0, Math.min(bounds.bottom, bottom) - Math.max(bounds.top, top));
+    const fraction = bounds.width && bounds.height ? Math.min(1, overlapX / bounds.width, overlapY / bounds.height) : 0;
+    const alpha = fraction * fraction * (3 - 2 * fraction);
+    if (alpha !== effect.alpha) {
+      effect.alpha = alpha;
+      effect.svg.style.setProperty("--echo-note-opacity", alpha.toFixed(3));
+    }
+    const loading = musicPeopleIndex.dataset.peopleLoading;
+    if (!alpha || !lane.running || !ownsView() || musicPeopleTuningOpen || musicPeopleList.inert || loading === "loading" || loading === "holding") {
+      pauseNoteEffect(slot);
+      return;
+    }
+    const elapsed = effect.lastTime ? Math.min(250, Math.max(0, now - effect.lastTime)) : 0;
+    effect.lastTime = now;
+    if (effect.sweep < 0) {
+      effect.wait -= elapsed;
+      if (effect.wait > 0) return;
+      effect.sweep = 0;
+      effect.duration = 900 + effect.random() * 200;
+    }
+    effect.sweep += elapsed / effect.duration;
+    if (effect.sweep >= 1) {
+      effect.sweep = -1;
+      effect.wait = 7000 + effect.random() * 8000;
+      effect.shimmer.setAttribute("opacity", "0");
+      return;
+    }
+    effect.shimmer.setAttribute("opacity", ".16");
+    effect.band.setAttribute("transform", `translate(${-16 + effect.sweep * 96} 0)`);
+  };
   const refreshAccess = () => {
     if (session.static) return;
     const viewport = musicPeopleList.getBoundingClientRect();
+    const now = performance.now();
     session.lanes.forEach(lane => lane.slots.forEach(slot => {
       if (!slot.button) return;
       const bounds = slot.button.getBoundingClientRect();
       const fullyVisible = lane.visible && bounds.left >= viewport.left + musicPeopleList.clientLeft
         && bounds.right <= viewport.right - musicPeopleList.clientLeft
         && bounds.top >= viewport.top + musicPeopleList.clientTop && bounds.bottom <= viewport.bottom - musicPeopleList.clientTop;
+      updateNoteEffect(lane, slot, viewport, now);
       setCaptionVisible(slot, fullyVisible && lane.running);
       setAccessible(slot, slot.button === document.activeElement || fullyVisible);
     }));
@@ -15190,6 +15281,7 @@ function startMusicPeopleEchoes() {
         lane.slots.forEach(slot => { if (slot.animation) run && !slot.waiting ? slot.animation.play() : slot.animation.pause(); });
       }
       if (!run) lane.slots.forEach(slot => setCaptionVisible(slot, false));
+      if (!run) lane.slots.forEach(pauseNoteEffect);
       if (run) lane.slots.filter(slot => slot.waiting).forEach(slot => { if (slot.waiting) recycle(lane, slot); });
     });
     if (schedule) ensureTick();
@@ -15349,6 +15441,7 @@ function startMusicPeopleEchoes() {
     if (hidingFocusedManual && ownsView() && (document.activeElement === document.body || manual.contains(document.activeElement))) {
       scene.querySelector("[data-music-people-directory-jump]")?.focus({ preventScroll: true });
     }
+    refreshAccess();
   }
   session.dispose = () => {
     if (!alive()) return;
