@@ -35686,7 +35686,7 @@ button.hall-crusades-archive-crystal:focus-visible {
 
 /* Melody-native pending identity, anchored to the existing artwork source. */
 .music-people-index:is([data-people-loading="loading"], [data-people-loading="holding"]) :is(.music-people-filters, .music-people-directory-header) { visibility: hidden; }
-.music-people-index[data-people-loading="holding"] .music-people-list { visibility: hidden; opacity: 0; }
+.music-people-index:is([data-people-loading="loading"], [data-people-loading="holding"]) .music-people-list { visibility: hidden; opacity: 0; }
 .music-people-index .music-people-loading { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .music-people-index .music-people-loading-motif {
   position: absolute; inset-inline-start: var(--melody-source-x, 50%); inset-block-start: var(--melody-source-y, 28%);

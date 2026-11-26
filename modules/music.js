@@ -15020,7 +15020,7 @@ function createMusicPeopleEchoNote(descriptor) {
     return (visualSeed >>> 0) / 4294967296;
   };
   note._echoNoteEffect = { svg, shimmer, band, random, wait: 7000 + random() * 8000,
-    sweep: -1, duration: 1000, lastTime: 0, alpha: 0 };
+    sweep: -1, duration: 1000, lastTime: 0, alpha: 0, arrival: 0, arrivalDelay: 0, arrivalTime: 0, arrivalVisible: false };
   return note;
 }
 
@@ -15091,7 +15091,11 @@ function startMusicPeopleEchoes() {
     slots: session.lanes.flatMap(lane => lane.slots.map(slot => {
       const phase = progress(slot);
       const released = Boolean(slot.released || slot.waiting || (!session.static && (slot.animation?.playState === "finished" || phase >= 1)));
-      return { key: released ? "" : slot.record?.key || "", ordinal: slot.ordinal, progress: phase, released };
+      const effect = slot.button?._echoNoteEffect;
+      const preservingArrival = musicPeoplePresentationMode === "score" && getRouteFromUrl().name === "music-people"
+        && v3RouteContext.route?.name === "music-people" && v3RouteContext.entry === visit.entry;
+      return { key: released ? "" : slot.record?.key || "", ordinal: slot.ordinal, progress: phase, released,
+        arrival: preservingArrival ? effect?.arrival ?? 1 : 1, arrivalDelay: preservingArrival ? effect?.arrivalDelay || 0 : 0 };
     }))
   });
   const listen = (node, type, handler, options) => {
@@ -15151,8 +15155,14 @@ function startMusicPeopleEchoes() {
     });
     slot.button.toggleAttribute("data-echo-caption-visible", visible);
   };
+  const notePresentationActive = () => !session.static && ownsView() && !musicPeopleTuningOpen && !musicPeopleList.inert
+    && !["loading", "holding"].includes(musicPeopleIndex.dataset.peopleLoading);
   const ensureTick = () => {
-    if (!session.frame && session.lanes.some(lane => lane.running && lane.slots.some(slot => slot.animation?.playState === "running"))) session.frame = requestAnimationFrame(tick);
+    const pendingArrival = notePresentationActive() && session.lanes.some(lane => lane.slots.some(slot => {
+      const effect = slot.button?._echoNoteEffect;
+      return effect?.arrivalVisible && effect.arrival < 1;
+    }));
+    if (!session.frame && (pendingArrival || session.lanes.some(lane => lane.running && lane.slots.some(slot => slot.animation?.playState === "running")))) session.frame = requestAnimationFrame(tick);
   };
   const recycle = (lane, slot, completed = null) => {
     if (!alive() || !session.lanes.includes(lane) || !lane.slots.includes(slot) || !slot.wrapper.isConnected) return;
@@ -15220,17 +15230,28 @@ function startMusicPeopleEchoes() {
     const overlapX = Math.max(0, Math.min(bounds.right, right) - Math.max(bounds.left, left));
     const overlapY = Math.max(0, Math.min(bounds.bottom, bottom) - Math.max(bounds.top, top));
     const fraction = bounds.width && bounds.height ? Math.min(1, overlapX / bounds.width, overlapY / bounds.height) : 0;
-    const alpha = fraction * fraction * (3 - 2 * fraction);
+    const geometryAlpha = fraction * fraction * (3 - 2 * fraction);
+    const visible = geometryAlpha > 0 && notePresentationActive();
+    effect.arrivalVisible = visible;
+    const arrivalElapsed = visible && effect.arrivalTime ? Math.min(250, Math.max(0, now - effect.arrivalTime)) : 0;
+    effect.arrivalTime = visible ? now : 0;
+    if (visible && effect.arrival < 1) {
+      const delay = Math.min(effect.arrivalDelay, arrivalElapsed);
+      effect.arrivalDelay -= delay;
+      effect.arrival = Math.min(1, effect.arrival + (arrivalElapsed - delay) / 500);
+    }
+    const running = visible && lane.running;
+    const elapsed = running && effect.lastTime ? Math.min(250, Math.max(0, now - effect.lastTime)) : 0;
+    const materialization = effect.arrival * effect.arrival * (3 - 2 * effect.arrival);
+    const alpha = geometryAlpha * materialization;
     if (alpha !== effect.alpha) {
       effect.alpha = alpha;
       effect.svg.style.setProperty("--echo-note-opacity", alpha.toFixed(3));
     }
-    const loading = musicPeopleIndex.dataset.peopleLoading;
-    if (!alpha || !lane.running || !ownsView() || musicPeopleTuningOpen || musicPeopleList.inert || loading === "loading" || loading === "holding") {
+    if (!running) {
       pauseNoteEffect(slot);
       return;
     }
-    const elapsed = effect.lastTime ? Math.min(250, Math.max(0, now - effect.lastTime)) : 0;
     effect.lastTime = now;
     if (effect.sweep < 0) {
       effect.wait -= elapsed;
@@ -15273,6 +15294,9 @@ function startMusicPeopleEchoes() {
   session.sync = (schedule = true) => {
     if (!alive()) return;
     if (session.pendingResize && !busy()) { layout(); return; }
+    if (!notePresentationActive()) session.lanes.forEach(lane => lane.slots.forEach(slot => {
+      if (slot.button?._echoNoteEffect) slot.button._echoNoteEffect.arrivalTime = 0;
+    }));
     session.lanes.forEach(lane => {
       const run = !session.static && ownsView() && !musicPeopleTuningOpen && lane.visible && !interacting(lane) && !session.pendingResize;
       if (run !== lane.running) {
@@ -15284,6 +15308,13 @@ function startMusicPeopleEchoes() {
       if (!run) lane.slots.forEach(pauseNoteEffect);
       if (run) lane.slots.filter(slot => slot.waiting).forEach(slot => { if (slot.waiting) recycle(lane, slot); });
     });
+    if (schedule && notePresentationActive()) {
+      const viewport = musicPeopleList.getBoundingClientRect();
+      const now = performance.now();
+      session.lanes.forEach(lane => lane.slots.forEach(slot => {
+        if (slot.button) updateNoteEffect(lane, slot, viewport, now);
+      }));
+    }
     if (schedule) ensureTick();
   };
   let laneObserver = null;
@@ -15402,7 +15433,14 @@ function startMusicPeopleEchoes() {
       const wrapper = document.createElement("div");
       wrapper.className = "music-people-echo-transit";
       const button = record ? createMusicPeopleEchoToken(record, index) : null;
-      if (record) { wrapper.dataset.echoToken = record.key; wrapper.appendChild(button); }
+      if (record) {
+        const effect = button._echoNoteEffect;
+        effect.arrival = staticMode ? 1 : remembered ? remembered.arrival ?? 1 : 0;
+        effect.arrivalDelay = staticMode ? 0 : remembered ? remembered.arrivalDelay || 0
+          : index / Math.max(1, capacity - 1) * 600;
+        wrapper.dataset.echoToken = record.key;
+        wrapper.appendChild(button);
+      }
       else wrapper.dataset.echoWaiting = "";
       lane.node.appendChild(wrapper);
       const slot = { record, wrapper, button, ordinal: index, width: tokenWidth, animation: null,
@@ -15535,6 +15573,7 @@ function createMusicPeopleEmptyState(hasPublicRows = true) {
 }
 
 let musicPeopleLoadingPresentation = null;
+const musicPeopleLoadingEntries = new Set();
 
 function clearMusicPeopleLoadingPresentation() {
   const current = musicPeopleLoadingPresentation;
@@ -15583,14 +15622,36 @@ function createMusicPeopleLoadingMotif() {
 }
 
 function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
+  if (v3RouteContext.route?.name !== "music-people" || getRouteFromUrl().name !== "music-people") {
+    clearMusicPeopleLoadingPresentation();
+    return;
+  }
+  const entry = v3RouteContext.entry;
   const current = musicPeopleLoadingPresentation;
   const sameOwner = current?.context === v3RouteContext;
+  if (current && !sameOwner) {
+    clearMusicPeopleLoadingPresentation();
+    syncMusicPeopleLoadingPresentation(isLoading, hasContent);
+    return;
+  }
   if (!isLoading) {
-    if (!current) return;
+    if (!current) {
+      if (hasContent && !musicPeopleLoadingEntries.has(entry) && !reducedMotion.matches) {
+        syncMusicPeopleLoadingPresentation(true, false);
+        if (musicPeopleLoadingPresentation) musicPeopleLoadingPresentation.hasContent = true;
+      } else musicPeopleLoadingEntries.add(entry);
+      return;
+    }
+    current.hasContent = Boolean(hasContent);
     const filters = musicPeopleIndex.querySelector("[data-music-people-filters]");
-    if (!sameOwner || !hasContent || reducedMotion.matches || !current.painted || !current.canPresent()
+    if (!sameOwner || !hasContent || reducedMotion.matches
       || !current.layer.isConnected || typeof current.layer.animate !== "function" || typeof musicPeopleList.animate !== "function") {
       clearMusicPeopleLoadingPresentation();
+      return;
+    }
+    if (!current.painted || !current.canPresent()) {
+      musicPeopleList.inert = true;
+      if (filters) filters.inert = true;
       return;
     }
     musicPeopleList.inert = current.phase === "leaving" ? current.wasListInert : true;
@@ -15608,6 +15669,7 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
       current.phase = "leaving";
       musicPeopleIndex.dataset.peopleLoading = "leaving";
       musicPeopleList.inert = current.wasListInert;
+      syncMusicPeopleEchoes();
       const activeFilters = musicPeopleIndex.querySelector("[data-music-people-filters]");
       if (activeFilters) activeFilters.inert = false;
       current.layer.setAttribute("aria-hidden", "true");
@@ -15632,9 +15694,10 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
   if (current && (!sameOwner || current.phase !== "loading")) clearMusicPeopleLoadingPresentation();
   if (!musicPeopleLoadingPresentation) {
     const layer = createMusicPeopleLoadingMotif();
-    const state = { layer, context: v3RouteContext, phase: "loading", painted: false, visibleAt: 0, frame: 0, timer: 0,
+    const state = { layer, context: v3RouteContext, phase: "loading", hasContent: false, painted: false, visibleAt: 0, frame: 0, timer: 0,
       wasListInert: Boolean(musicPeopleList.inert), cleanup: [], animations: [] };
     musicPeopleLoadingPresentation = state;
+    musicPeopleLoadingEntries.add(entry);
     musicPeopleIndex.appendChild(layer);
     const ownsView = () => musicPeopleLoadingPresentation === state && v3RouteContext === state.context
       && v3RouteContext.route?.name === "music-people" && musicPeopleIndex.classList.contains("is-active")
@@ -15653,6 +15716,7 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
           if (state.canPresent()) {
             state.painted = true;
             state.visibleAt = performance.now();
+            if (state.hasContent) syncMusicPeopleLoadingPresentation(false, true);
           }
         });
       });
