@@ -304,6 +304,11 @@ const MUSIC_PEOPLE_INDEX_API_ROUTE = "/api/music/people/db";
 const MUSIC_PEOPLE_INDEX_API_LIMIT = 100;
 const MUSIC_PEOPLE_INDEX_MAX_PAGES = 20;
 const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 45000;
+// Progress extends recovery, never the individual HTTP request. These caps bound
+// work even when a backend continually changes generations or reports progress.
+const MUSIC_PEOPLE_PREPARATION_MAX_MS = 600000;
+const MUSIC_PEOPLE_PREPARATION_MAX_POLLS = 300;
+const MUSIC_PEOPLE_PREPARATION_MAX_GENERATIONS = 8;
 const MUSIC_PERSON_DETAIL_SEARCH_LIMIT = 25;
 const MUSIC_PERSON_DETAIL_TIMEOUT_MS = 20000;
 const MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT = 4;
@@ -343,6 +348,7 @@ let musicPeopleIndexDataState = "idle";
 let musicPeopleIndexLastGoodRows = null;
 let musicPeopleIndexRequestGeneration = 0;
 let musicPeopleIndexRetryAllowed;
+let musicPeopleIndexRecoveryState = null;
 const musicPersonDetailArchiveRequests = new Map();
 const musicPersonDetailArchiveRows = new Map();
 const musicPersonTaggedShowHydrationCache = new Map();
@@ -473,10 +479,13 @@ function retryMusicBandsIndexState() {
 }
 
 function retryMusicPeopleIndexState() {
-  if (musicPeopleIndexRequest || musicPeopleIndexRetryAllowed === false) {
+  const statusCheck = ["stalled", "bounded"].includes(musicPeopleIndexRecoveryState);
+  if (musicPeopleIndexRequest || (musicPeopleIndexRetryAllowed === false && !statusCheck)) {
     return;
   }
-  const retryRelationships = musicPeopleIndexRetryAllowed === true;
+  // Checking a stalled preparation is read-only; only the backend's explicit
+  // error permission can authorize a new relationship preparation.
+  const retryRelationships = !statusCheck && musicPeopleIndexRetryAllowed === true;
   musicPeopleIndexLoaded = false;
 
   setMusicPeopleIndexCollection(musicPeopleIndexLastGoodRows || [], "loading", false);
@@ -2668,6 +2677,7 @@ function createMusicPeopleReadinessError(state, readiness = null, failClosedRetr
   error.musicPeopleRetryAllowed = failClosedRetry || (state === "malformed" && !readiness)
     ? false : getMusicPeopleRetryPermission(readiness);
   error.musicPeopleReadinessActive = readiness?.active === true;
+  error.musicPeopleReadinessDetails = readiness;
   return error;
 }
 
@@ -2740,20 +2750,22 @@ function getMusicPeoplePayloadTotalPages(payload) {
 }
 
 function fetchMusicPeopleIndexPage(page, signal, retryRelationships = false) {
-  return withMusicRequestTimeout(fetch(getMusicPeopleIndexApiUrl(page, retryRelationships), {
+  const request = fetch(getMusicPeopleIndexApiUrl(page, retryRelationships), {
     cache: "no-store",
     signal,
-  }), null, MUSIC_PEOPLE_INDEX_TIMEOUT_MS, "Music people").then((response) => {
+  }).then((response) => {
     if (!response.ok) {
       throw new Error(`Music people request failed (${response.status})`);
     }
     return response.json();
   }).then(payload => validateMusicPeopleIndexPage(payload, page));
+  return withMusicRequestTimeout(request, null, MUSIC_PEOPLE_INDEX_TIMEOUT_MS, "Music people");
 }
 
-function fetchMusicPeopleIndexPayloads(signal, retryRelationships = false) {
+function fetchMusicPeopleIndexPayloads(signal, retryRelationships = false, onReadiness = null) {
   return fetchMusicPeopleIndexPage(1, signal, retryRelationships).then((firstPayload) => {
     const readiness = getMusicPeopleRelationshipReadiness(firstPayload);
+    onReadiness?.(readiness);
     if (readiness && (readiness.status !== "ready" || !readiness.authoritative)) {
       throw createMusicPeopleReadinessError(readiness.status === "error" ? "error" : "preparing", readiness);
     }
@@ -2771,6 +2783,7 @@ function fetchMusicPeopleIndexPayloads(signal, retryRelationships = false) {
         error.musicPeopleReadiness = "retry";
         error.musicPeopleRetryAllowed = getMusicPeopleRetryPermission(readiness);
         error.musicPeopleReadinessActive = readiness.active === true;
+        error.musicPeopleReadinessDetails = readiness;
       }
       throw error;
     });
@@ -2961,6 +2974,44 @@ function requestMusicPersonDetailArchive(personId) {
   return request;
 }
 
+// One bounded recovery session per index request. Backend timestamps/heartbeats
+// alone cannot keep a stalled scan alive: completed work must actually increase.
+function createMusicPeopleRecovery({ now = Date.now, stallMs = MUSIC_PEOPLE_INDEX_TIMEOUT_MS,
+  maxMs = MUSIC_PEOPLE_PREPARATION_MAX_MS, maxPolls = MUSIC_PEOPLE_PREPARATION_MAX_POLLS,
+  maxGenerations = MUSIC_PEOPLE_PREPARATION_MAX_GENERATIONS } = {}) {
+  const started = now();
+  let progressed = started, polls = 0, generations = 0, cohort = null, albums = 0, pages = 0;
+  const fail = state => {
+    const error = new Error(state === "stalled" ? "Relationship preparation stopped making progress" : "Relationship recovery limit reached");
+    error.musicPeopleRecovery = state;
+    return error;
+  };
+  return {
+    observe(readiness) {
+      if (!readiness) return;
+      const key = JSON.stringify([readiness.scope, readiness.generation, readiness.started_at || readiness.completed_at]);
+      const nextAlbums = Number.isSafeInteger(readiness.albums_processed) && readiness.albums_processed >= 0 ? readiness.albums_processed : 0;
+      const nextPages = Number.isSafeInteger(readiness.pages_processed) && readiness.pages_processed >= 0 ? readiness.pages_processed : 0;
+      if (cohort !== key) {
+        cohort = key; generations++; albums = nextAlbums; pages = nextPages;
+      } else if (nextAlbums >= albums && nextPages >= pages && (nextAlbums > albums || nextPages > pages)) {
+        albums = nextAlbums; pages = nextPages; progressed = now();
+      }
+    },
+    check(hasReadiness, settled = false) {
+      if (now() - started >= maxMs || polls > maxPolls || generations > maxGenerations) throw fail("bounded");
+      if (!(hasReadiness && settled) && now() - (hasReadiness ? progressed : started) >= stallMs) {
+        if (hasReadiness) throw fail("stalled");
+        throw createMusicRequestTimeoutError("Music people", stallMs);
+      }
+    },
+    poll() { polls++; },
+    remaining(hasReadiness) {
+      return Math.max(0, Math.min(maxMs - (now() - started), stallMs - (now() - (hasReadiness ? progressed : started))));
+    },
+  };
+}
+
 function requestMusicPeopleIndexData(options = {}) {
   if (musicPeopleIndexRequest) return musicPeopleIndexRequest;
   if (musicPeopleIndexLoaded) return Promise.resolve(true);
@@ -2974,43 +3025,54 @@ function requestMusicPeopleIndexData(options = {}) {
   const generation = ++musicPeopleIndexRequestGeneration;
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const budget = getMusicRequestTimeoutMs(MUSIC_PEOPLE_INDEX_TIMEOUT_MS);
-  const deadline = Date.now() + budget;
-  let request = null;
+  // Scale only with the existing test timeout override; production uses 10min.
+  const hardBudget = Math.ceil(budget * MUSIC_PEOPLE_PREPARATION_MAX_MS / MUSIC_PEOPLE_INDEX_TIMEOUT_MS);
+  const recovery = createMusicPeopleRecovery({ stallMs: budget, maxMs: hardBudget });
+  let request = null, hardTimer = 0, legacyTimer = 0, relationshipContractSeen = false, recoveryLimitError = null;
   const current = () => generation === musicPeopleIndexRequestGeneration && musicPeopleIndexRequest === request;
-  const requireCurrent = () => {
-    if (!current() || controller?.signal.aborted || Date.now() >= deadline) {
-      throw createMusicRequestTimeoutError("Music people", budget);
-    }
+  const requireCurrent = (settled = false) => {
+    if (recoveryLimitError) throw recoveryLimitError;
+    if (!current() || controller?.signal.aborted) throw createMusicRequestTimeoutError("Music people", budget);
+    recovery.check(relationshipContractSeen, settled);
   };
+  musicPeopleIndexRecoveryState = null;
   setMusicPeopleIndexCollection(musicPeopleIndexLastGoodRows || [], "loading", false);
 
   const work = Promise.resolve().then(async () => {
     let accepted = null;
-    let relationshipContractSeen = false;
     for (let attempt = 1; ; attempt += 1) {
+      recovery.poll();
       requireCurrent();
       try {
         const retryThisAttempt = retryRelationships;
         retryRelationships = false;
         if (retryThisAttempt) musicPeopleIndexRetryAllowed = false;
-        const payloads = await fetchMusicPeopleIndexPayloads(controller?.signal, retryThisAttempt);
-        requireCurrent();
+        const payloads = await fetchMusicPeopleIndexPayloads(controller?.signal, retryThisAttempt, readiness => {
+          if (relationshipContractSeen && !readiness) throw createMusicPeopleReadinessError("malformed");
+          if (readiness) {
+            relationshipContractSeen = true;
+            window.clearTimeout(legacyTimer);
+            recovery.observe(readiness);
+          }
+        });
         const readiness = getMusicPeopleRelationshipReadiness(payloads[0]);
         if (relationshipContractSeen && !readiness) throw createMusicPeopleReadinessError("malformed");
         relationshipContractSeen = relationshipContractSeen || Boolean(readiness);
+        recovery.observe(readiness);
+        requireCurrent(true);
         musicPeopleIndexRetryAllowed = getMusicPeopleRetryPermission(readiness);
         const rows = normalizeLiveMusicPeople(payloads);
         if (rows.length !== payloads[0].total) throw new Error("Music people inventory contains missing or duplicate identities");
         const publicRows = rows.map(normalizeMusicPeopleIndexRow).filter(isPublicMusicPeopleIndexRow);
-        // Older deployments expose no readiness contract, so their all-zero public rows remain ambiguous.
         if (!readiness && publicRows.length && !publicRows.some(hasVisibleMusicPeoplePhotoCount)) {
           throw new Error("Music people archive counts are not ready");
         }
         accepted = { rows, state: publicRows.some(hasVisibleMusicPeoplePhotoCount) ? "live" : "empty" };
         break;
       } catch (error) {
-        requireCurrent();
         relationshipContractSeen = relationshipContractSeen || Boolean(error.musicPeopleReadiness);
+        recovery.observe(error.musicPeopleReadinessDetails);
+        requireCurrent(["error", "malformed"].includes(error.musicPeopleReadiness) && !error.musicPeopleReadinessActive);
         if (Object.prototype.hasOwnProperty.call(error, "musicPeopleRetryAllowed")) musicPeopleIndexRetryAllowed = error.musicPeopleRetryAllowed;
         const draining = error.musicPeopleReadiness === "error" && error.musicPeopleReadinessActive && musicPeopleIndexRetryAllowed === false;
         if (draining && musicPeopleIndexDataState !== "error") {
@@ -3026,7 +3088,7 @@ function requestMusicPeopleIndexData(options = {}) {
         await new Promise((resolve, reject) => {
           const signal = controller?.signal;
           const finish = () => { signal?.removeEventListener("abort", cancel); resolve(); };
-          const timer = window.setTimeout(finish, Math.min(relationshipContractSeen ? 2000 : attempt * 2000, Math.max(0, deadline - Date.now())));
+          const timer = window.setTimeout(finish, Math.min(relationshipContractSeen ? 2000 : attempt * 2000, recovery.remaining(relationshipContractSeen)));
           const cancel = () => {
             window.clearTimeout(timer);
             signal?.removeEventListener("abort", cancel);
@@ -3037,7 +3099,7 @@ function requestMusicPeopleIndexData(options = {}) {
         });
       }
     }
-    requireCurrent();
+    requireCurrent(true);
     setMusicPeopleIndexCollection(accepted.rows, accepted.state, false);
     musicPeopleIndexLastGoodRows = accepted.rows.slice();
     musicPeopleIndexLoaded = true;
@@ -3045,9 +3107,22 @@ function requestMusicPeopleIndexData(options = {}) {
     return true;
   });
 
-  request = withMusicRequestTimeout(work, controller, budget, "Music people")
-    .catch(() => {
+  const hardStop = new Promise((_, reject) => {
+    const stop = bounded => {
+      const error = bounded ? new Error("Relationship recovery limit reached") : createMusicRequestTimeoutError("Music people", budget);
+      error.musicPeopleRecovery = bounded ? "bounded" : null;
+      recoveryLimitError = error;
+      controller?.abort();
+      reject(error);
+    };
+    hardTimer = window.setTimeout(() => stop(relationshipContractSeen), hardBudget);
+    // An older backend keeps its original overall 45s bound, including page fan-out.
+    legacyTimer = window.setTimeout(() => stop(false), budget);
+  });
+  request = Promise.race([work, hardStop])
+    .catch(error => {
       if (current()) {
+        musicPeopleIndexRecoveryState = error.musicPeopleRecovery || null;
         musicPeopleIndexLoaded = false;
         restoreMusicPeopleFallback();
         renderMusicPeopleIndex({ shouldResetScroll: false });
@@ -3055,6 +3130,9 @@ function requestMusicPeopleIndexData(options = {}) {
       return false;
     })
     .finally(() => {
+      window.clearTimeout(hardTimer);
+      window.clearTimeout(legacyTimer);
+      controller?.abort();
       if (current()) {
         musicPeopleIndex?.setAttribute("aria-busy", "false");
         musicPeopleIndexRequest = null;
@@ -16037,11 +16115,17 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
 }
 
 function createMusicPeopleErrorState() {
-  const card = createMusicV3StateCard("error", "musicPeople", { retry: true });
+  const statusCheck = ["stalled", "bounded"].includes(musicPeopleIndexRecoveryState);
+  const card = createMusicV3StateCard("error", "musicPeople", statusCheck ? {
+    title: musicPeopleIndexRecoveryState === "stalled" ? "Resonance preparation stalled" : "Resonance is still preparing",
+    text: "The archive has not published a new verified result. Check its status without restarting preparation.",
+    retry: { label: "Check Status", onClick: retryMusicPeopleIndexState },
+  } : { retry: true });
+  card.dataset.musicPeopleRecovery = musicPeopleIndexRecoveryState || "unavailable";
   card.dataset.musicPeopleRetryAllowed = musicPeopleIndexRetryAllowed === undefined ? "legacy" : String(musicPeopleIndexRetryAllowed);
   card.querySelectorAll("button").forEach(button => {
     button.dataset.musicPeopleRetry = "";
-    button.disabled = Boolean(musicPeopleIndexRequest) || musicPeopleIndexRetryAllowed === false;
+    button.disabled = Boolean(musicPeopleIndexRequest) || (musicPeopleIndexRetryAllowed === false && !statusCheck);
     button.setAttribute("aria-disabled", String(button.disabled));
   });
   return card;
