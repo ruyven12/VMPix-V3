@@ -303,7 +303,7 @@ const MUSIC_BANDS_INDEX_TIMEOUT_MS = 8000;
 const MUSIC_PEOPLE_INDEX_API_ROUTE = "/api/music/people/db";
 const MUSIC_PEOPLE_INDEX_API_LIMIT = 100;
 const MUSIC_PEOPLE_INDEX_MAX_PAGES = 20;
-const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 15000;
+const MUSIC_PEOPLE_INDEX_TIMEOUT_MS = 45000;
 const MUSIC_PERSON_DETAIL_SEARCH_LIMIT = 25;
 const MUSIC_PERSON_DETAIL_TIMEOUT_MS = 20000;
 const MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT = 4;
@@ -340,6 +340,8 @@ let musicPeopleIndexCollection = [];
 let musicPeopleIndexRequest = null;
 let musicPeopleIndexLoaded = false;
 let musicPeopleIndexDataState = "idle";
+let musicPeopleIndexLastGoodRows = null;
+let musicPeopleIndexRequestGeneration = 0;
 const musicPersonDetailArchiveRequests = new Map();
 const musicPersonDetailArchiveRows = new Map();
 const musicPersonTaggedShowHydrationCache = new Map();
@@ -470,12 +472,12 @@ function retryMusicBandsIndexState() {
 }
 
 function retryMusicPeopleIndexState() {
-  musicPeopleIndexLoaded = false;
   if (musicPeopleIndexRequest) {
     return;
   }
+  musicPeopleIndexLoaded = false;
 
-  setMusicPeopleIndexCollection([], "loading");
+  setMusicPeopleIndexCollection(musicPeopleIndexLastGoodRows || [], "loading", false);
   renderMusicPeopleIndex({ shouldResetScroll: false });
   requestMusicPeopleIndexData();
 }
@@ -2554,20 +2556,20 @@ function getMusicPeopleIndexCollection() {
   return Array.isArray(musicPeopleIndexCollection) ? musicPeopleIndexCollection : [];
 }
 
-function setMusicPeopleIndexCollection(rows, stateName = "fallback") {
+function setMusicPeopleIndexCollection(rows, stateName = "fallback", includeDetailCache = true) {
   const sourceRows = Array.isArray(rows) ? rows : [];
   musicPeopleIndexCollection = sourceRows.map((row) => {
     const rowKey = getMusicPersonCollectionKey(row);
-    const archiveRow = rowKey ? musicPersonDetailArchiveRows.get(rowKey) : null;
+    const archiveRow = includeDetailCache && rowKey ? musicPersonDetailArchiveRows.get(rowKey) : null;
     if (!archiveRow) {
       return row;
     }
     return {
-      ...row,
       ...archiveRow,
+      ...row,
       backend_record: {
-        ...(row.backend_record || row),
         ...(archiveRow.backend_record || archiveRow),
+        ...(row.backend_record || row),
       },
     };
   });
@@ -2652,19 +2654,28 @@ function getMusicPersonDetailApiUrl(personId) {
   return apiUrl;
 }
 
+function validateMusicPeopleIndexPage(payload, expectedPage, reference = null) {
+  const integer = value => Number.isSafeInteger(value) && value >= 0;
+  if (!payload || payload.ok !== true || payload.error || !Array.isArray(payload.data)
+    || !integer(payload.total) || !integer(payload.totalPages) || !integer(payload.page)
+    || !integer(payload.limit) || !integer(payload.count) || payload.limit !== MUSIC_PEOPLE_INDEX_API_LIMIT
+    || payload.page !== expectedPage || payload.totalPages > MUSIC_PEOPLE_INDEX_MAX_PAGES
+    || payload.totalPages !== Math.ceil(payload.total / payload.limit)
+    || (payload.total > 0 && expectedPage > payload.totalPages)
+    || (payload.total === 0 && expectedPage !== 1)
+    || payload.count !== payload.data.length
+    || payload.count !== Math.min(payload.limit, Math.max(0, payload.total - (expectedPage - 1) * payload.limit))
+    || payload.hasNextPage !== (expectedPage < payload.totalPages)
+    || (payload.hasPrevPage !== undefined && payload.hasPrevPage !== (expectedPage > 1))
+    || payload.data.some(row => !row || typeof row !== "object" || Array.isArray(row))
+    || (reference && ["total", "totalPages", "limit"].some(key => payload[key] !== reference[key]))) {
+    throw new Error("Music people inventory is incomplete or inconsistent");
+  }
+  return payload;
+}
+
 function getMusicPeoplePayloadTotalPages(payload) {
-  const directTotalPages = Number.parseInt(payload?.totalPages ?? payload?.meta?.pagination?.totalPages, 10);
-  if (Number.isFinite(directTotalPages) && directTotalPages > 0) {
-    return Math.min(MUSIC_PEOPLE_INDEX_MAX_PAGES, directTotalPages);
-  }
-
-  const totalRows = Number.parseInt(payload?.total ?? payload?.meta?.pagination?.total, 10);
-  const pageLimit = Number.parseInt(payload?.limit ?? payload?.meta?.pagination?.limit, 10) || MUSIC_PEOPLE_INDEX_API_LIMIT;
-  if (!Number.isFinite(totalRows) || totalRows <= 0 || pageLimit <= 0) {
-    return 1;
-  }
-
-  return Math.min(MUSIC_PEOPLE_INDEX_MAX_PAGES, Math.ceil(totalRows / pageLimit));
+  return validateMusicPeopleIndexPage(payload, 1).totalPages;
 }
 
 function fetchMusicPeopleIndexPage(page, signal) {
@@ -2676,21 +2687,21 @@ function fetchMusicPeopleIndexPage(page, signal) {
       throw new Error(`Music people request failed (${response.status})`);
     }
     return response.json();
-  });
+  }).then(payload => validateMusicPeopleIndexPage(payload, page));
 }
 
 function fetchMusicPeopleIndexPayloads(signal) {
   return fetchMusicPeopleIndexPage(1, signal).then((firstPayload) => {
     const totalPages = getMusicPeoplePayloadTotalPages(firstPayload);
-    if (totalPages <= 1) {
-      return [firstPayload];
-    }
-
     const pageRequests = [];
     for (let page = 2; page <= totalPages; page += 1) {
       pageRequests.push(fetchMusicPeopleIndexPage(page, signal));
     }
-    return Promise.all(pageRequests).then((restPayloads) => [firstPayload, ...restPayloads]);
+    return Promise.all(pageRequests).then((restPayloads) => {
+      const payloads = [firstPayload, ...restPayloads];
+      payloads.forEach((payload, index) => validateMusicPeopleIndexPage(payload, index + 1, firstPayload));
+      return payloads;
+    });
   });
 }
 
@@ -2746,7 +2757,7 @@ function normalizeLiveMusicPeople(payload) {
 }
 
 function restoreMusicPeopleFallback() {
-  setMusicPeopleIndexCollection([], "error");
+  setMusicPeopleIndexCollection(musicPeopleIndexLastGoodRows || [], "error", false);
 }
 
 function getMusicPersonCollectionKey(person) {
@@ -2803,6 +2814,7 @@ function mergeMusicPersonDetailArchiveRow(row) {
   rowKeys.forEach((rowKey) => {
     musicPersonDetailArchiveRows.set(rowKey, normalizedRow);
   });
+  if (musicPeopleIndexLastGoodRows !== null || musicPeopleIndexRequest || musicPeopleIndexDataState === "loading") return normalizedRow;
   const existingRows = getMusicPeopleIndexCollection();
   const existingIndex = existingRows.findIndex((person) => {
     const personKeys = getMusicPersonArchiveCacheKeys(person);
@@ -2821,7 +2833,7 @@ function mergeMusicPersonDetailArchiveRow(row) {
   } else {
     nextRows.push(normalizedRow);
   }
-  setMusicPeopleIndexCollection(nextRows, musicPeopleIndexDataState === "loading" ? "live" : musicPeopleIndexDataState);
+  setMusicPeopleIndexCollection(nextRows, musicPeopleIndexDataState);
   return normalizedRow;
 }
 
@@ -2878,58 +2890,85 @@ function requestMusicPersonDetailArchive(personId) {
 }
 
 function requestMusicPeopleIndexData() {
-  if (musicPeopleIndexLoaded) {
-    return Promise.resolve(true);
-  }
-  if (musicPeopleIndexRequest) {
-    return musicPeopleIndexRequest;
-  }
+  if (musicPeopleIndexRequest) return musicPeopleIndexRequest;
+  if (musicPeopleIndexLoaded) return Promise.resolve(true);
   if (typeof fetch !== "function") {
     restoreMusicPeopleFallback();
     renderMusicPeopleIndex({ shouldResetScroll: false });
     return Promise.resolve(false);
   }
 
-  setMusicPeopleIndexCollection([], "loading");
+  const generation = ++musicPeopleIndexRequestGeneration;
   const controller = typeof AbortController === "function" ? new AbortController() : null;
-  const timeoutId = controller
-    ? window.setTimeout(() => controller.abort(), MUSIC_PEOPLE_INDEX_TIMEOUT_MS)
-    : 0;
+  const budget = getMusicRequestTimeoutMs(MUSIC_PEOPLE_INDEX_TIMEOUT_MS);
+  const deadline = Date.now() + budget;
+  let request = null;
+  const current = () => generation === musicPeopleIndexRequestGeneration && musicPeopleIndexRequest === request;
+  const requireCurrent = () => {
+    if (!current() || controller?.signal.aborted || Date.now() >= deadline) {
+      throw createMusicRequestTimeoutError("Music people", budget);
+    }
+  };
+  setMusicPeopleIndexCollection(musicPeopleIndexLastGoodRows || [], "loading", false);
 
-  musicPeopleIndexRequest = fetchMusicPeopleIndexPayloads(controller?.signal)
-    .then((payloads) => {
-      const liveRows = normalizeLiveMusicPeople(payloads);
-      if (liveRows.length === 0) {
-        if (hasMusicExplicitEmptyPayload(payloads, ["data", "items", "rows", "people", "results", "records"])) {
-          setMusicPeopleIndexCollection([], "empty");
-          musicPeopleIndexLoaded = true;
-          renderMusicPeopleIndex({ shouldResetScroll: false });
-          return true;
+  const work = Promise.resolve().then(async () => {
+    let accepted = null;
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      requireCurrent();
+      try {
+        const payloads = await fetchMusicPeopleIndexPayloads(controller?.signal);
+        requireCurrent();
+        const rows = normalizeLiveMusicPeople(payloads);
+        if (rows.length !== payloads[0].total) throw new Error("Music people inventory contains missing or duplicate identities");
+        const publicRows = rows.map(normalizeMusicPeopleIndexRow).filter(isPublicMusicPeopleIndexRow);
+        // archive=cache has no readiness signal: all-zero public rows do not certify an empty archive.
+        if (publicRows.length && !publicRows.some(hasVisibleMusicPeoplePhotoCount)) {
+          throw new Error("Music people archive counts are not ready");
         }
-        throw new Error("Music people response contained no usable rows");
+        accepted = { rows, state: publicRows.length ? "live" : "empty" };
+        break;
+      } catch (error) {
+        requireCurrent();
+        if (attempt === 3) throw error;
+        await new Promise((resolve, reject) => {
+          const signal = controller?.signal;
+          const finish = () => { signal?.removeEventListener("abort", cancel); resolve(); };
+          const timer = window.setTimeout(finish, Math.min(attempt * 2000, Math.max(0, deadline - Date.now())));
+          const cancel = () => {
+            window.clearTimeout(timer);
+            signal?.removeEventListener("abort", cancel);
+            reject(createMusicRequestTimeoutError("Music people", budget));
+          };
+          signal?.addEventListener("abort", cancel, { once: true });
+          if (signal?.aborted) cancel();
+        });
       }
+    }
+    requireCurrent();
+    setMusicPeopleIndexCollection(accepted.rows, accepted.state, false);
+    musicPeopleIndexLastGoodRows = accepted.rows.slice();
+    musicPeopleIndexLoaded = true;
+    renderMusicPeopleIndex({ shouldResetScroll: false });
+    return true;
+  });
 
-      setMusicPeopleIndexCollection(liveRows, "live");
-      musicPeopleIndexLoaded = true;
-      renderMusicPeopleIndex({ shouldResetScroll: false });
-      return true;
-    })
+  request = withMusicRequestTimeout(work, controller, budget, "Music people")
     .catch(() => {
-      restoreMusicPeopleFallback();
-      renderMusicPeopleIndex({ shouldResetScroll: false });
+      if (current()) {
+        musicPeopleIndexLoaded = false;
+        restoreMusicPeopleFallback();
+        renderMusicPeopleIndex({ shouldResetScroll: false });
+      }
       return false;
     })
     .finally(() => {
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
+      if (current()) {
+        musicPeopleIndex?.setAttribute("aria-busy", "false");
+        musicPeopleIndexRequest = null;
       }
-      if (musicPeopleIndex) {
-        musicPeopleIndex.setAttribute("aria-busy", "false");
-      }
-      musicPeopleIndexRequest = null;
     });
-
-  return musicPeopleIndexRequest;
+  musicPeopleIndexRequest = request;
+  return request;
 }
 
 function getMusicShowsPayloadRows(payload) {
@@ -15943,8 +15982,11 @@ function renderMusicPeopleIndex(options = {}) {
       fragment.append(createMockStateCard("partial", "musicPeople"));
     }
   }
-  if (!forcedState && !["loading", "error"].includes(dataState) && filteredRows.length === 0) {
+  if (!forcedState && musicPeopleIndexLoaded && ["live", "empty"].includes(dataState) && filteredRows.length === 0) {
     fragment.append(createMusicPeopleEmptyState(allRows.length > 0));
+  }
+  if (!forcedState && dataState === "error" && numberedRows.length > 0) {
+    fragment.append(createMusicV3StateCard("error", "musicPeople", { retry: true }));
   }
   stopMusicPeopleEchoes();
   stopMusicPeopleSignatureMotion();
@@ -15952,7 +15994,7 @@ function renderMusicPeopleIndex(options = {}) {
   musicPeopleIndex.dataset.peoplePresentation = musicPeoplePresentationMode;
   syncMusicPeopleSignatureMotion();
   startMusicPeopleEchoes();
-  syncMusicPeopleLoadingPresentation(isLoading, !isLoading && numberedRows.length > 0 && (!forcedState || forcedState === "partial"));
+  syncMusicPeopleLoadingPresentation(isLoading, !isLoading && dataState !== "error" && numberedRows.length > 0 && (!forcedState || forcedState === "partial"));
   if (restorePresentation) musicPeopleList.scrollTo({ top: musicPeoplePresentationScroll[musicPeoplePresentationMode], behavior: "instant" });
   restoreMusicPeopleFilterFocus(focusMeta);
 
