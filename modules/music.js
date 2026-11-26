@@ -342,6 +342,7 @@ let musicPeopleIndexLoaded = false;
 let musicPeopleIndexDataState = "idle";
 let musicPeopleIndexLastGoodRows = null;
 let musicPeopleIndexRequestGeneration = 0;
+let musicPeopleIndexRetryAllowed;
 const musicPersonDetailArchiveRequests = new Map();
 const musicPersonDetailArchiveRows = new Map();
 const musicPersonTaggedShowHydrationCache = new Map();
@@ -472,14 +473,15 @@ function retryMusicBandsIndexState() {
 }
 
 function retryMusicPeopleIndexState() {
-  if (musicPeopleIndexRequest) {
+  if (musicPeopleIndexRequest || musicPeopleIndexRetryAllowed === false) {
     return;
   }
+  const retryRelationships = musicPeopleIndexRetryAllowed === true;
   musicPeopleIndexLoaded = false;
 
   setMusicPeopleIndexCollection(musicPeopleIndexLastGoodRows || [], "loading", false);
   renderMusicPeopleIndex({ shouldResetScroll: false });
-  requestMusicPeopleIndexData();
+  requestMusicPeopleIndexData({ retryRelationships });
 }
 
 function retryMusicShowsArchiveState() {
@@ -2619,11 +2621,12 @@ function getMusicPeoplePayloadRows(payload) {
   return [];
 }
 
-function getMusicPeopleIndexApiUrl(page = 1) {
+function getMusicPeopleIndexApiUrl(page = 1, retryRelationships = false) {
   const apiUrl = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
   apiUrl.searchParams.set("limit", String(MUSIC_PEOPLE_INDEX_API_LIMIT));
   apiUrl.searchParams.set("page", String(Math.max(1, Number.parseInt(page, 10) || 1)));
   apiUrl.searchParams.set("archive", "cache");
+  if (page === 1 && retryRelationships === true) apiUrl.searchParams.set("retry_relationships", "1");
   return apiUrl;
 }
 
@@ -2654,9 +2657,17 @@ function getMusicPersonDetailApiUrl(personId) {
   return apiUrl;
 }
 
-function createMusicPeopleReadinessError(state) {
+function getMusicPeopleRetryPermission(readiness) {
+  if (!Object.prototype.hasOwnProperty.call(readiness || {}, "retry_allowed")) return undefined;
+  return readiness.retry_allowed === true && readiness.status === "error" && readiness.active === false;
+}
+
+function createMusicPeopleReadinessError(state, readiness = null, failClosedRetry = false) {
   const error = new Error("Music people relationship counts are unavailable");
   error.musicPeopleReadiness = state;
+  error.musicPeopleRetryAllowed = failClosedRetry || (state === "malformed" && !readiness)
+    ? false : getMusicPeopleRetryPermission(readiness);
+  error.musicPeopleReadinessActive = readiness?.active === true;
   return error;
 }
 
@@ -2676,10 +2687,13 @@ function getMusicPeopleRelationshipReadiness(payload) {
     || !["preparing", "ready", "error"].includes(value.status) || typeof value.authoritative !== "boolean"
     || !Number.isSafeInteger(value.generation) || value.generation < 0 || value.scope !== "linked_music_show_albums"
     || !(value.reason === null || typeof value.reason === "string")
+    || (Object.prototype.hasOwnProperty.call(value, "retry_allowed") && typeof value.retry_allowed !== "boolean")
+    || (Object.prototype.hasOwnProperty.call(value, "active") && typeof value.active !== "boolean")
+    || (value.retry_allowed === true && (value.status !== "error" || value.active !== false))
     || !stamp(value.started_at) || !stamp(value.completed_at) || !stamp(value.expires_at)
     || (value.authoritative && value.status !== "ready")
     || (value.status === "ready" && value.authoritative && value.completed_at === null)) {
-    throw createMusicPeopleReadinessError("malformed");
+    throw createMusicPeopleReadinessError("malformed", value, true);
   }
   const ready = value.status === "ready" && value.authoritative;
   if (rows.some(row => !row || typeof row !== "object" || Array.isArray(row) || row.relationship_status !== value.status || (ready
@@ -2687,7 +2701,7 @@ function getMusicPeopleRelationshipReadiness(payload) {
       || !Number.isSafeInteger(row.verified_photo_count) || row.verified_photo_count < 0
     : row.photo_count_status !== "unavailable" || row.verified_photo_count !== null
       || !["stored_fallback", "none"].includes(row.photo_count_source)))) {
-    throw createMusicPeopleReadinessError("malformed");
+    throw createMusicPeopleReadinessError("malformed", value);
   }
   return value;
 }
@@ -2708,14 +2722,14 @@ function validateMusicPeopleIndexPage(payload, expectedPage, reference = null) {
     || (payload.hasPrevPage !== undefined && payload.hasPrevPage !== (expectedPage > 1))
     || payload.data.some(row => !row || typeof row !== "object" || Array.isArray(row))
     || (reference && ["total", "totalPages", "limit"].some(key => payload[key] !== reference[key]))) {
-    if (readiness) throw createMusicPeopleReadinessError("malformed");
+    if (readiness) throw createMusicPeopleReadinessError("malformed", readiness);
     throw new Error("Music people inventory is incomplete or inconsistent");
   }
   if (reference) {
     const previous = getMusicPeopleRelationshipReadiness(reference);
     if (Boolean(readiness) !== Boolean(previous) || (readiness && (readiness.status !== "ready" || !readiness.authoritative
       || ["generation", "scope", "completed_at"].some(key => readiness[key] !== previous[key])))) {
-      throw createMusicPeopleReadinessError(readiness?.status === "error" ? "error" : "preparing");
+      throw createMusicPeopleReadinessError(readiness?.status === "error" ? "error" : "preparing", readiness);
     }
   }
   return payload;
@@ -2725,8 +2739,8 @@ function getMusicPeoplePayloadTotalPages(payload) {
   return validateMusicPeopleIndexPage(payload, 1).totalPages;
 }
 
-function fetchMusicPeopleIndexPage(page, signal) {
-  return withMusicRequestTimeout(fetch(getMusicPeopleIndexApiUrl(page), {
+function fetchMusicPeopleIndexPage(page, signal, retryRelationships = false) {
+  return withMusicRequestTimeout(fetch(getMusicPeopleIndexApiUrl(page, retryRelationships), {
     cache: "no-store",
     signal,
   }), null, MUSIC_PEOPLE_INDEX_TIMEOUT_MS, "Music people").then((response) => {
@@ -2737,11 +2751,11 @@ function fetchMusicPeopleIndexPage(page, signal) {
   }).then(payload => validateMusicPeopleIndexPage(payload, page));
 }
 
-function fetchMusicPeopleIndexPayloads(signal) {
-  return fetchMusicPeopleIndexPage(1, signal).then((firstPayload) => {
+function fetchMusicPeopleIndexPayloads(signal, retryRelationships = false) {
+  return fetchMusicPeopleIndexPage(1, signal, retryRelationships).then((firstPayload) => {
     const readiness = getMusicPeopleRelationshipReadiness(firstPayload);
     if (readiness && (readiness.status !== "ready" || !readiness.authoritative)) {
-      throw createMusicPeopleReadinessError(readiness.status === "error" ? "error" : "preparing");
+      throw createMusicPeopleReadinessError(readiness.status === "error" ? "error" : "preparing", readiness);
     }
     const totalPages = getMusicPeoplePayloadTotalPages(firstPayload);
     const pageRequests = [];
@@ -2753,7 +2767,11 @@ function fetchMusicPeopleIndexPayloads(signal) {
       payloads.forEach((payload, index) => validateMusicPeopleIndexPage(payload, index + 1, firstPayload));
       return payloads;
     }).catch(error => {
-      if (readiness && !error.musicPeopleReadiness) error.musicPeopleReadiness = "retry";
+      if (readiness && !error.musicPeopleReadiness) {
+        error.musicPeopleReadiness = "retry";
+        error.musicPeopleRetryAllowed = getMusicPeopleRetryPermission(readiness);
+        error.musicPeopleReadinessActive = readiness.active === true;
+      }
       throw error;
     });
   });
@@ -2943,7 +2961,7 @@ function requestMusicPersonDetailArchive(personId) {
   return request;
 }
 
-function requestMusicPeopleIndexData() {
+function requestMusicPeopleIndexData(options = {}) {
   if (musicPeopleIndexRequest) return musicPeopleIndexRequest;
   if (musicPeopleIndexLoaded) return Promise.resolve(true);
   if (typeof fetch !== "function") {
@@ -2952,6 +2970,7 @@ function requestMusicPeopleIndexData() {
     return Promise.resolve(false);
   }
 
+  let retryRelationships = options.retryRelationships === true && musicPeopleIndexRetryAllowed === true;
   const generation = ++musicPeopleIndexRequestGeneration;
   const controller = typeof AbortController === "function" ? new AbortController() : null;
   const budget = getMusicRequestTimeoutMs(MUSIC_PEOPLE_INDEX_TIMEOUT_MS);
@@ -2971,11 +2990,15 @@ function requestMusicPeopleIndexData() {
     for (let attempt = 1; ; attempt += 1) {
       requireCurrent();
       try {
-        const payloads = await fetchMusicPeopleIndexPayloads(controller?.signal);
+        const retryThisAttempt = retryRelationships;
+        retryRelationships = false;
+        if (retryThisAttempt) musicPeopleIndexRetryAllowed = false;
+        const payloads = await fetchMusicPeopleIndexPayloads(controller?.signal, retryThisAttempt);
         requireCurrent();
         const readiness = getMusicPeopleRelationshipReadiness(payloads[0]);
         if (relationshipContractSeen && !readiness) throw createMusicPeopleReadinessError("malformed");
         relationshipContractSeen = relationshipContractSeen || Boolean(readiness);
+        musicPeopleIndexRetryAllowed = getMusicPeopleRetryPermission(readiness);
         const rows = normalizeLiveMusicPeople(payloads);
         if (rows.length !== payloads[0].total) throw new Error("Music people inventory contains missing or duplicate identities");
         const publicRows = rows.map(normalizeMusicPeopleIndexRow).filter(isPublicMusicPeopleIndexRow);
@@ -2988,7 +3011,18 @@ function requestMusicPeopleIndexData() {
       } catch (error) {
         requireCurrent();
         relationshipContractSeen = relationshipContractSeen || Boolean(error.musicPeopleReadiness);
-        if (["error", "malformed"].includes(error.musicPeopleReadiness) || (!relationshipContractSeen && attempt >= 3)) throw error;
+        if (Object.prototype.hasOwnProperty.call(error, "musicPeopleRetryAllowed")) musicPeopleIndexRetryAllowed = error.musicPeopleRetryAllowed;
+        const draining = error.musicPeopleReadiness === "error" && error.musicPeopleReadinessActive && musicPeopleIndexRetryAllowed === false;
+        if (draining && musicPeopleIndexDataState !== "error") {
+          musicPeopleIndexLoaded = false;
+          restoreMusicPeopleFallback();
+          renderMusicPeopleIndex({ shouldResetScroll: false });
+        }
+        if (error.musicPeopleReadiness === "preparing" && musicPeopleIndexDataState === "error") {
+          setMusicPeopleIndexCollection(musicPeopleIndexLastGoodRows || [], "loading", false);
+          renderMusicPeopleIndex({ shouldResetScroll: false });
+        }
+        if ((!draining && ["error", "malformed"].includes(error.musicPeopleReadiness)) || (!relationshipContractSeen && attempt >= 3)) throw error;
         await new Promise((resolve, reject) => {
           const signal = controller?.signal;
           const finish = () => { signal?.removeEventListener("abort", cancel); resolve(); };
@@ -3024,6 +3058,7 @@ function requestMusicPeopleIndexData() {
       if (current()) {
         musicPeopleIndex?.setAttribute("aria-busy", "false");
         musicPeopleIndexRequest = null;
+        if (musicPeopleIndexDataState === "error") renderMusicPeopleIndex({ shouldResetScroll: false });
       }
     });
   musicPeopleIndexRequest = request;
@@ -16001,6 +16036,17 @@ function syncMusicPeopleLoadingPresentation(isLoading, hasContent) {
   if (filters) filters.inert = true;
 }
 
+function createMusicPeopleErrorState() {
+  const card = createMusicV3StateCard("error", "musicPeople", { retry: true });
+  card.dataset.musicPeopleRetryAllowed = musicPeopleIndexRetryAllowed === undefined ? "legacy" : String(musicPeopleIndexRetryAllowed);
+  card.querySelectorAll("button").forEach(button => {
+    button.dataset.musicPeopleRetry = "";
+    button.disabled = Boolean(musicPeopleIndexRequest) || musicPeopleIndexRetryAllowed === false;
+    button.setAttribute("aria-disabled", String(button.disabled));
+  });
+  return card;
+}
+
 function renderMusicPeopleIndex(options = {}) {
   if (!musicPeopleList) {
     return;
@@ -16035,7 +16081,7 @@ function renderMusicPeopleIndex(options = {}) {
   } else if (forcedState && forcedState !== "partial") {
     fragment.append(createMusicV3StateCard(forcedState, "musicPeople"));
   } else if (dataState === "error" && numberedRows.length === 0) {
-    fragment.append(createMusicV3StateCard("error", "musicPeople", { retry: true }));
+    fragment.append(createMusicPeopleErrorState());
   } else {
     if (musicPeoplePresentationMode === "score" && numberedRows.length) {
       fragment.append(createMusicPeopleEchoes(numberedRows));
@@ -16054,7 +16100,7 @@ function renderMusicPeopleIndex(options = {}) {
     fragment.append(createMusicPeopleEmptyState(allRows.length > 0));
   }
   if (!forcedState && dataState === "error" && numberedRows.length > 0) {
-    fragment.append(createMusicV3StateCard("error", "musicPeople", { retry: true }));
+    fragment.append(createMusicPeopleErrorState());
   }
   stopMusicPeopleEchoes();
   stopMusicPeopleSignatureMotion();
