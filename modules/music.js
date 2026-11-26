@@ -14985,6 +14985,7 @@ function getMusicPeopleEchoVisit(rows) {
 }
 
 let musicPeopleEchoNoteSequence = 0;
+let musicPeopleEchoNameSequence = 0;
 
 // Score-only paint layers: the persistent glyph remains unchanged beneath a masked sweep.
 function createMusicPeopleEchoNote(descriptor) {
@@ -15042,7 +15043,16 @@ function createMusicPeopleEchoToken(record, slotIndex) {
   name.textContent = person.name;
   if (descriptor.id && typeof IntersectionObserver === "function") {
     echo.dataset.echoNameMotion = "caption";
-    name.style.setProperty("--echo-name-index", "0");
+    let nameSeed = (descriptor.seed ^ Math.imul(++musicPeopleEchoNameSequence, 2246822519) ^ (performance.now() * 1000)) >>> 0 || 1;
+    const random = () => {
+      nameSeed ^= nameSeed << 13;
+      nameSeed ^= nameSeed >>> 17;
+      nameSeed ^= nameSeed << 5;
+      return (nameSeed >>> 0) / 4294967296;
+    };
+    echo._echoNameEffect = { node: name, random, phase: "waiting", elapsed: 0, wait: null, opacity: 0,
+      served: false, lastTime: 0, hovered: null, pressed: false, interacting: false };
+    name.style.setProperty("--echo-name-opacity", "0");
   }
   const note = createMusicPeopleEchoNote(descriptor);
   echo._echoNoteEffect = note._echoNoteEffect;
@@ -15098,7 +15108,8 @@ function startMusicPeopleEchoes() {
         && v3RouteContext.route?.name === "music-people" && v3RouteContext.entry === visit.entry;
       return { key: released ? "" : slot.record?.key || "", ordinal: slot.ordinal, progress: phase, released,
         arrival: preservingArrival ? effect?.arrival ?? 1 : 1, arrivalDelay: preservingArrival ? effect?.arrivalDelay || 0 : 0,
-        shimmer: effect ? { firstSweep: effect.firstSweep, wait: effect.wait, duration: effect.duration, sweep: effect.sweep } : null };
+        shimmer: effect ? { firstSweep: effect.firstSweep, wait: effect.wait, duration: effect.duration, sweep: effect.sweep } : null,
+        name: slot.button?._echoNameEffect ? (({ phase, elapsed, wait, opacity, served }) => ({ phase, elapsed, wait, opacity, served }))(slot.button._echoNameEffect) : null };
     }))
   });
   const listen = (node, type, handler, options) => {
@@ -15113,6 +15124,7 @@ function startMusicPeopleEchoes() {
   const unwatch = slot => {
     pauseNoteEffect(slot);
     slot.button?._echoNoteEffect?.shimmer.setAttribute("opacity", "0");
+    if (slot.button?._echoNameEffect) slot.button._echoNameEffect.lastTime = 0;
     const note = slot.button?.querySelector("[data-signature-id]");
     if (note) musicPeopleSignatureObserver?.unobserve(note);
   };
@@ -15150,12 +15162,8 @@ function startMusicPeopleEchoes() {
     slot.button.setAttribute("aria-hidden", String(!visible));
   };
   const setCaptionVisible = (slot, visible) => {
-    if (!slot.button || session.static || session.desktop || slot.captionVisible === visible) return;
+    if (!slot.button || session.static || slot.captionVisible === visible) return;
     slot.captionVisible = visible;
-    const name = slot.button.querySelector(".music-people-echo-name");
-    name?.getAnimations().forEach(animation => {
-      if (animation.animationName === "synchronicity-memory-date") animation.currentTime = 0;
-    });
     slot.button.toggleAttribute("data-echo-caption-visible", visible);
   };
   const notePresentationActive = () => !session.static && ownsView() && !musicPeopleTuningOpen && !musicPeopleList.inert
@@ -15281,6 +15289,71 @@ function startMusicPeopleEchoes() {
     effect.shimmer.setAttribute("opacity", ".58");
     effect.band.setAttribute("transform", `translate(${-16 + effect.sweep * 96} 0)`);
   };
+  const updateNameEffect = (lane, slot, viewport, now) => {
+    const effect = slot.button?._echoNameEffect;
+    if (!effect || session.static) return;
+    const svg = slot.button._echoNoteEffect.svg.getBoundingClientRect();
+    const name = effect.node.getBoundingClientRect();
+    const staff = lane.node.getBoundingClientRect();
+    const left = Math.max(viewport.left + musicPeopleList.clientLeft, staff.left);
+    const right = Math.min(viewport.left + musicPeopleList.clientLeft + musicPeopleList.clientWidth, staff.right);
+    const top = Math.max(viewport.top + musicPeopleList.clientTop, staff.top);
+    const bottom = Math.min(viewport.top + musicPeopleList.clientTop + musicPeopleList.clientHeight, staff.bottom);
+    const fraction = Math.min(...[svg, name].map(rect => Math.min(
+      Math.max(0, Math.min(rect.right, right) - Math.max(rect.left, left)) / Math.max(1, rect.right - rect.left),
+      Math.max(0, Math.min(rect.bottom, bottom) - Math.max(rect.top, top)) / Math.max(1, rect.bottom - rect.top))));
+    const visibilityGain = fraction * fraction * (3 - 2 * fraction);
+    const fits = [svg, name].every(rect => rect.left >= left && rect.right <= right && rect.top >= top && rect.bottom <= bottom);
+    const interactionReady = fits && notePresentationActive();
+    const ready = interactionReady && !musicPeopleIndex.dataset.peopleLoading && slot.button._echoNoteEffect.arrival >= 1;
+    if (effect.hovered === null) effect.hovered = slot.button.matches(":hover");
+    const interaction = interactionReady && (effect.hovered || effect.pressed || slot.button === document.activeElement);
+    const paint = () => {
+      effect.node.style.setProperty("--echo-name-opacity", String(effect.opacity * visibilityGain));
+      slot.button.dataset.echoNamePhase = effect.phase;
+    };
+    if (interaction || effect.interacting) {
+      effect.phase = "hold";
+      effect.elapsed = 0;
+      effect.opacity = .96;
+      effect.lastTime = 0;
+      effect.interacting = interaction;
+      paint();
+      if (interaction) return;
+    }
+    if (!ready || !lane.running) { effect.lastTime = 0; paint(); return; }
+    const elapsed = effect.lastTime ? Math.min(250, Math.max(0, now - effect.lastTime)) : 0;
+    effect.lastTime = now;
+    if (effect.phase === "waiting") {
+      const velocity = (session.width + slot.width) / slot.duration;
+      const budget = velocity > 0 ? Math.max(0, (right - Math.max(svg.right, name.right) - 4) / velocity) : 0;
+      const availableWait = budget - 2400 - 250;
+      if (availableWait < 0) return;
+      if (effect.wait === null) {
+        const maximum = Math.min(2800, availableWait);
+        const minimum = Math.min(600, maximum * .25);
+        effect.wait = effect.served ? 3500 + effect.random() * 4500 : minimum + effect.random() * (maximum - minimum);
+      }
+      effect.wait -= elapsed;
+      if (effect.wait > 0) return;
+      effect.phase = "in";
+      effect.elapsed = 0;
+    }
+    effect.elapsed += elapsed;
+    if (effect.phase === "in") {
+      const phase = Math.min(1, effect.elapsed / 400);
+      effect.opacity = .96 * phase * phase * (3 - 2 * phase);
+      if (phase === 1) { effect.phase = "hold"; effect.elapsed = 0; }
+    } else if (effect.phase === "hold") {
+      effect.opacity = .96;
+      if (effect.elapsed >= 1500) { effect.served = true; effect.phase = "out"; effect.elapsed = 0; }
+    } else if (effect.phase === "out") {
+      const phase = Math.min(1, effect.elapsed / 500);
+      effect.opacity = .96 * (1 - phase * phase * (3 - 2 * phase));
+      if (phase === 1) { effect.phase = "waiting"; effect.elapsed = 0; effect.wait = null; }
+    }
+    paint();
+  };
   const refreshAccess = () => {
     if (session.static) return;
     const viewport = musicPeopleList.getBoundingClientRect();
@@ -15292,6 +15365,7 @@ function startMusicPeopleEchoes() {
         && bounds.right <= viewport.right - musicPeopleList.clientLeft
         && bounds.top >= viewport.top + musicPeopleList.clientTop && bounds.bottom <= viewport.bottom - musicPeopleList.clientTop;
       updateNoteEffect(lane, slot, viewport, now);
+      updateNameEffect(lane, slot, viewport, now);
       setCaptionVisible(slot, fullyVisible && lane.running);
       setAccessible(slot, slot.button === document.activeElement || fullyVisible);
     }));
@@ -15318,13 +15392,17 @@ function startMusicPeopleEchoes() {
       }
       if (!run) lane.slots.forEach(slot => setCaptionVisible(slot, false));
       if (!run) lane.slots.forEach(pauseNoteEffect);
+      if (!run) lane.slots.forEach(slot => { if (slot.button?._echoNameEffect) slot.button._echoNameEffect.lastTime = 0; });
       if (run) lane.slots.filter(slot => slot.waiting).forEach(slot => { if (slot.waiting) recycle(lane, slot); });
     });
     if (schedule && notePresentationActive()) {
       const viewport = musicPeopleList.getBoundingClientRect();
       const now = performance.now();
       session.lanes.forEach(lane => lane.slots.forEach(slot => {
-        if (slot.button) updateNoteEffect(lane, slot, viewport, now);
+        if (slot.button) {
+          updateNoteEffect(lane, slot, viewport, now);
+          updateNameEffect(lane, slot, viewport, now);
+        }
       }));
     }
     if (schedule) ensureTick();
@@ -15406,9 +15484,19 @@ function startMusicPeopleEchoes() {
       session.lanes.push(lane);
       field.appendChild(node);
       bindLane(node, "pointerenter", event => { if (event.pointerType === "mouse") { lane.hovered = true; session.sync(); } });
+      bindLane(node, "pointerover", event => {
+        const button = event.target.closest("[data-echo-person-key]");
+        if (event.pointerType === "mouse" && button?._echoNameEffect) { button._echoNameEffect.hovered = true; session.sync(); }
+      });
+      bindLane(node, "pointerout", event => {
+        const button = event.target.closest("[data-echo-person-key]");
+        if (event.pointerType === "mouse" && button?._echoNameEffect && !button.contains(event.relatedTarget)) { button._echoNameEffect.hovered = false; session.sync(); }
+      });
       bindLane(node, "pointerleave", event => { if (event.pointerType === "mouse") { lane.hovered = false; session.sync(); } });
       bindLane(node, "pointerdown", event => {
         lane.held = true;
+        const nameEffect = event.target.closest("[data-echo-person-key]")?._echoNameEffect;
+        if (nameEffect) nameEffect.pressed = true;
         session.pinnedKey = event.target.closest("[data-echo-person-key]")?.dataset.echoPersonKey || session.pinnedKey;
         session.sync();
       });
@@ -15462,6 +15550,10 @@ function startMusicPeopleEchoes() {
               effect.band.setAttribute("transform", `translate(${-16 + effect.sweep * 96} 0)`);
             }
           }
+        }
+        if (remembered?.name && button._echoNameEffect) {
+          Object.assign(button._echoNameEffect, remembered.name);
+          button._echoNameEffect.node.style.setProperty("--echo-name-opacity", String(button._echoNameEffect.opacity));
         }
         wrapper.dataset.echoToken = record.key;
         wrapper.appendChild(button);
@@ -15521,7 +15613,13 @@ function startMusicPeopleEchoes() {
   listen(document, "visibilitychange", () => session.sync());
   listen(document, "click", () => session.sync());
   listen(window, "popstate", () => session.sync());
-  const releasePointer = () => { session.lanes.forEach(lane => { lane.held = false; }); session.sync(); };
+  const releasePointer = () => {
+    session.lanes.forEach(lane => {
+      lane.held = false;
+      lane.slots.forEach(slot => { if (slot.button?._echoNameEffect) slot.button._echoNameEffect.pressed = false; });
+    });
+    session.sync();
+  };
   listen(window, "pointerup", releasePointer);
   listen(window, "pointercancel", releasePointer);
   const mediaChange = () => layout();

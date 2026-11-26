@@ -35610,18 +35610,13 @@ button.hall-crusades-archive-crystal:focus-visible {
   .music-people-index .music-people-echo:nth-child(n + 9) { display: flex; }
 }
 
-/* Reuse the existing Shows under-photo caption cycle; notes never drift. */
+/* Score names use independent visible-time clocks; static modes stay readable. */
 .music-people-index .music-people-echo[data-echo-name-motion="caption"] .music-people-echo-name {
-  color: #e2e9ff; text-shadow: 0 1px 2px #080b19; opacity: 0;
-  animation: synchronicity-memory-date 27s ease-in-out infinite;
-  animation-delay: calc(.6s + var(--echo-name-index, 0) * 27s / var(--echo-caption-limit, 8)); animation-play-state: paused;
+  color: #e2e9ff; text-shadow: 0 1px 2px #080b19; opacity: var(--echo-name-opacity, 0); animation: none;
 }
-.site-shell[data-shell-route="music-people"] .music-people-index.is-active[aria-hidden="false"]:not([inert]) .music-people-echo[data-echo-name-motion="caption"] .music-people-note[data-signature-visible] + .music-people-echo-name {
-  animation-play-state: running;
-}
-.music-people-index .music-people-echo:is(:hover, :focus, :active) .music-people-echo-name { opacity: .96 !important; }
+.music-people-index [data-echo-mode="static"] .music-people-echo[data-echo-name-motion="caption"] .music-people-echo-name { opacity: .96; }
 @media (prefers-reduced-motion: reduce) {
-  .music-people-index .music-people-echo[data-echo-name-motion="caption"] .music-people-echo-name { animation: none; opacity: .96; }
+  .music-people-index .music-people-echo[data-echo-name-motion="caption"] .music-people-echo-name { opacity: .96; }
 }
 
 .music-people-index .music-people-echoes { --echo-caption-limit: 8; }
@@ -35668,10 +35663,6 @@ button.hall-crusades-archive-crystal:focus-visible {
 .music-people-index [data-echo-mode="static"] .music-people-staff { grid-template-rows: none; grid-auto-rows: minmax(min-content, 1fr); }
 .music-people-index .music-people-echoes[hidden],
 .music-people-index .music-people-directory-header[hidden] { display: none; }
-@media (max-width: 63.999rem) {
-  .music-people-index [data-echo-mode="moving"] .music-people-echo[data-echo-name-motion="caption"] .music-people-echo-name { animation-play-state: paused !important; }
-  .music-people-index [data-echo-mode="moving"] .music-people-echo[data-echo-name-motion="caption"][data-echo-caption-visible] .music-people-note[data-signature-visible] + .music-people-echo-name { animation-play-state: running !important; }
-}
 
 /* Let the real lane stack size the scene before its footer. */
 .music-people-index .music-people-echoes { grid-template-rows: auto minmax(min-content, 1fr) auto; }
