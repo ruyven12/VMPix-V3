@@ -2654,8 +2654,47 @@ function getMusicPersonDetailApiUrl(personId) {
   return apiUrl;
 }
 
+function createMusicPeopleReadinessError(state) {
+  const error = new Error("Music people relationship counts are unavailable");
+  error.musicPeopleReadiness = state;
+  return error;
+}
+
+function getMusicPeopleRelationshipReadiness(payload) {
+  const fields = ["relationship_status", "photo_count_status", "photo_count_source", "verified_photo_count"];
+  const explicit = Object.prototype.hasOwnProperty.call(payload || {}, "relationship_readiness");
+  const rows = Array.isArray(payload?.data) ? payload.data : [];
+  if (!explicit) {
+    if (rows.some(row => fields.some(key => Object.prototype.hasOwnProperty.call(row || {}, key)))) {
+      throw createMusicPeopleReadinessError("malformed");
+    }
+    return null;
+  }
+  const value = payload.relationship_readiness;
+  const stamp = date => date === null || (typeof date === "string" && Number.isFinite(Date.parse(date)));
+  if (!value || typeof value !== "object" || Array.isArray(value)
+    || !["preparing", "ready", "error"].includes(value.status) || typeof value.authoritative !== "boolean"
+    || !Number.isSafeInteger(value.generation) || value.generation < 0 || value.scope !== "linked_music_show_albums"
+    || !(value.reason === null || typeof value.reason === "string")
+    || !stamp(value.started_at) || !stamp(value.completed_at) || !stamp(value.expires_at)
+    || (value.authoritative && value.status !== "ready")
+    || (value.status === "ready" && value.authoritative && value.completed_at === null)) {
+    throw createMusicPeopleReadinessError("malformed");
+  }
+  const ready = value.status === "ready" && value.authoritative;
+  if (rows.some(row => !row || typeof row !== "object" || Array.isArray(row) || row.relationship_status !== value.status || (ready
+    ? row.photo_count_status !== "verified" || row.photo_count_source !== "relationship_cache"
+      || !Number.isSafeInteger(row.verified_photo_count) || row.verified_photo_count < 0
+    : row.photo_count_status !== "unavailable" || row.verified_photo_count !== null
+      || !["stored_fallback", "none"].includes(row.photo_count_source)))) {
+    throw createMusicPeopleReadinessError("malformed");
+  }
+  return value;
+}
+
 function validateMusicPeopleIndexPage(payload, expectedPage, reference = null) {
   const integer = value => Number.isSafeInteger(value) && value >= 0;
+  const readiness = getMusicPeopleRelationshipReadiness(payload);
   if (!payload || payload.ok !== true || payload.error || !Array.isArray(payload.data)
     || !integer(payload.total) || !integer(payload.totalPages) || !integer(payload.page)
     || !integer(payload.limit) || !integer(payload.count) || payload.limit !== MUSIC_PEOPLE_INDEX_API_LIMIT
@@ -2669,7 +2708,15 @@ function validateMusicPeopleIndexPage(payload, expectedPage, reference = null) {
     || (payload.hasPrevPage !== undefined && payload.hasPrevPage !== (expectedPage > 1))
     || payload.data.some(row => !row || typeof row !== "object" || Array.isArray(row))
     || (reference && ["total", "totalPages", "limit"].some(key => payload[key] !== reference[key]))) {
+    if (readiness) throw createMusicPeopleReadinessError("malformed");
     throw new Error("Music people inventory is incomplete or inconsistent");
+  }
+  if (reference) {
+    const previous = getMusicPeopleRelationshipReadiness(reference);
+    if (Boolean(readiness) !== Boolean(previous) || (readiness && (readiness.status !== "ready" || !readiness.authoritative
+      || ["generation", "scope", "completed_at"].some(key => readiness[key] !== previous[key])))) {
+      throw createMusicPeopleReadinessError(readiness?.status === "error" ? "error" : "preparing");
+    }
   }
   return payload;
 }
@@ -2692,6 +2739,10 @@ function fetchMusicPeopleIndexPage(page, signal) {
 
 function fetchMusicPeopleIndexPayloads(signal) {
   return fetchMusicPeopleIndexPage(1, signal).then((firstPayload) => {
+    const readiness = getMusicPeopleRelationshipReadiness(firstPayload);
+    if (readiness && (readiness.status !== "ready" || !readiness.authoritative)) {
+      throw createMusicPeopleReadinessError(readiness.status === "error" ? "error" : "preparing");
+    }
     const totalPages = getMusicPeoplePayloadTotalPages(firstPayload);
     const pageRequests = [];
     for (let page = 2; page <= totalPages; page += 1) {
@@ -2701,6 +2752,9 @@ function fetchMusicPeopleIndexPayloads(signal) {
       const payloads = [firstPayload, ...restPayloads];
       payloads.forEach((payload, index) => validateMusicPeopleIndexPage(payload, index + 1, firstPayload));
       return payloads;
+    }).catch(error => {
+      if (readiness && !error.musicPeopleReadiness) error.musicPeopleReadiness = "retry";
+      throw error;
     });
   });
 }
@@ -2913,27 +2967,32 @@ function requestMusicPeopleIndexData() {
 
   const work = Promise.resolve().then(async () => {
     let accepted = null;
-    for (let attempt = 1; attempt <= 3; attempt += 1) {
+    let relationshipContractSeen = false;
+    for (let attempt = 1; ; attempt += 1) {
       requireCurrent();
       try {
         const payloads = await fetchMusicPeopleIndexPayloads(controller?.signal);
         requireCurrent();
+        const readiness = getMusicPeopleRelationshipReadiness(payloads[0]);
+        if (relationshipContractSeen && !readiness) throw createMusicPeopleReadinessError("malformed");
+        relationshipContractSeen = relationshipContractSeen || Boolean(readiness);
         const rows = normalizeLiveMusicPeople(payloads);
         if (rows.length !== payloads[0].total) throw new Error("Music people inventory contains missing or duplicate identities");
         const publicRows = rows.map(normalizeMusicPeopleIndexRow).filter(isPublicMusicPeopleIndexRow);
-        // archive=cache has no readiness signal: all-zero public rows do not certify an empty archive.
-        if (publicRows.length && !publicRows.some(hasVisibleMusicPeoplePhotoCount)) {
+        // Older deployments expose no readiness contract, so their all-zero public rows remain ambiguous.
+        if (!readiness && publicRows.length && !publicRows.some(hasVisibleMusicPeoplePhotoCount)) {
           throw new Error("Music people archive counts are not ready");
         }
-        accepted = { rows, state: publicRows.length ? "live" : "empty" };
+        accepted = { rows, state: publicRows.some(hasVisibleMusicPeoplePhotoCount) ? "live" : "empty" };
         break;
       } catch (error) {
         requireCurrent();
-        if (attempt === 3) throw error;
+        relationshipContractSeen = relationshipContractSeen || Boolean(error.musicPeopleReadiness);
+        if (["error", "malformed"].includes(error.musicPeopleReadiness) || (!relationshipContractSeen && attempt >= 3)) throw error;
         await new Promise((resolve, reject) => {
           const signal = controller?.signal;
           const finish = () => { signal?.removeEventListener("abort", cancel); resolve(); };
-          const timer = window.setTimeout(finish, Math.min(attempt * 2000, Math.max(0, deadline - Date.now())));
+          const timer = window.setTimeout(finish, Math.min(relationshipContractSeen ? 2000 : attempt * 2000, Math.max(0, deadline - Date.now())));
           const cancel = () => {
             window.clearTimeout(timer);
             signal?.removeEventListener("abort", cancel);
@@ -12419,6 +12478,14 @@ function getMusicPeopleLetter(person) {
   return musicPeopleAlphabet.includes(firstLetter) ? firstLetter : "#";
 }
 
+function getVerifiedMusicPeoplePhotoCount(person) {
+  const fields = ["relationship_status", "photo_count_status", "photo_count_source", "verified_photo_count"];
+  if (!fields.some(key => Object.prototype.hasOwnProperty.call(person || {}, key))) return undefined;
+  return person.relationship_status === "ready" && person.photo_count_status === "verified"
+    && person.photo_count_source === "relationship_cache" && Number.isSafeInteger(person.verified_photo_count)
+    && person.verified_photo_count >= 0 ? person.verified_photo_count : null;
+}
+
 function normalizeMusicPeopleIndexRow(person) {
   const source = person?.backend_record && typeof person.backend_record === "object"
     ? { ...person.backend_record, ...person }
@@ -12453,7 +12520,8 @@ function normalizeMusicPeopleIndexRow(person) {
     source.backend_record?.stats?.event_count,
     source.backend_record?.stats?.appearanceCount
   );
-  const photos = getOptionalMusicPeopleCountValue(
+  const verifiedPhotos = getVerifiedMusicPeoplePhotoCount(source);
+  const photos = verifiedPhotos !== undefined ? verifiedPhotos : getOptionalMusicPeopleCountValue(
     source.photos,
     source.photoCount,
     source.photo_count,
