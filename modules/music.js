@@ -15004,7 +15004,9 @@ function createMusicPeopleEchoNote(descriptor) {
   while (svg.firstChild) glyph.appendChild(svg.firstChild);
   const definitions = add("defs", {}, svg);
   const gradient = add("linearGradient", { id: `${prefix}-light`, x1: "0%", y1: "0%", x2: "100%", y2: "0%" }, definitions);
-  [[0, 0], [50, 1], [100, 0]].forEach(([offset, opacity]) => add("stop", { offset: `${offset}%`, "stop-color": "#fff", "stop-opacity": opacity }, gradient));
+  [[0, 0, "#9e91ad"], [28, .28, "#9e91ad"], [43, .65, "#f3e8ff"], [49, 1, "#fff"],
+    [55, .85, "#fff"], [68, .18, "#cbbfda"], [100, 0, "#cbbfda"]]
+    .forEach(([offset, opacity, color]) => add("stop", { offset: `${offset}%`, "stop-color": color, "stop-opacity": opacity }, gradient));
   const mask = add("mask", { id: `${prefix}-mask`, maskUnits: "userSpaceOnUse", x: 0, y: 0, width: 64, height: 64, "mask-type": "alpha" }, definitions);
   add("use", { href: `#${prefix}-glyph` }, mask);
   svg.appendChild(glyph);
@@ -15019,7 +15021,7 @@ function createMusicPeopleEchoNote(descriptor) {
     visualSeed ^= visualSeed << 5;
     return (visualSeed >>> 0) / 4294967296;
   };
-  note._echoNoteEffect = { svg, shimmer, band, random, wait: 7000 + random() * 8000,
+  note._echoNoteEffect = { svg, shimmer, band, random, wait: null, firstSweep: true,
     sweep: -1, duration: 1000, lastTime: 0, alpha: 0, arrival: 0, arrivalDelay: 0, arrivalTime: 0, arrivalVisible: false };
   return note;
 }
@@ -15095,7 +15097,8 @@ function startMusicPeopleEchoes() {
       const preservingArrival = musicPeoplePresentationMode === "score" && getRouteFromUrl().name === "music-people"
         && v3RouteContext.route?.name === "music-people" && v3RouteContext.entry === visit.entry;
       return { key: released ? "" : slot.record?.key || "", ordinal: slot.ordinal, progress: phase, released,
-        arrival: preservingArrival ? effect?.arrival ?? 1 : 1, arrivalDelay: preservingArrival ? effect?.arrivalDelay || 0 : 0 };
+        arrival: preservingArrival ? effect?.arrival ?? 1 : 1, arrivalDelay: preservingArrival ? effect?.arrivalDelay || 0 : 0,
+        shimmer: effect ? { firstSweep: effect.firstSweep, wait: effect.wait, duration: effect.duration, sweep: effect.sweep } : null };
     }))
   });
   const listen = (node, type, handler, options) => {
@@ -15248,25 +15251,34 @@ function startMusicPeopleEchoes() {
       effect.alpha = alpha;
       effect.svg.style.setProperty("--echo-note-opacity", alpha.toFixed(3));
     }
-    if (!running) {
+    if (!running || effect.arrival < 1 || musicPeopleIndex.dataset.peopleLoading || geometryAlpha < .999) {
       pauseNoteEffect(slot);
       return;
     }
     effect.lastTime = now;
+    if (effect.wait === null) {
+      effect.wait = effect.firstSweep ? 1200 + effect.random() * 2400 : 5000 + effect.random() * 5000;
+      effect.duration = 900 + effect.random() * 200;
+    }
     if (effect.sweep < 0) {
+      const velocity = (session.width + slot.width) / slot.duration;
+      const budget = velocity > 0 ? Math.max(0, (right - bounds.right - 4) / velocity) : 0;
+      const availableWait = budget - effect.duration - 250;
+      if (availableWait < 0) { pauseNoteEffect(slot); return; }
+      if (effect.firstSweep) effect.wait = Math.min(effect.wait, availableWait);
       effect.wait -= elapsed;
       if (effect.wait > 0) return;
       effect.sweep = 0;
-      effect.duration = 900 + effect.random() * 200;
+      effect.firstSweep = false;
     }
     effect.sweep += elapsed / effect.duration;
     if (effect.sweep >= 1) {
       effect.sweep = -1;
-      effect.wait = 7000 + effect.random() * 8000;
+      effect.wait = 5000 + effect.random() * 5000;
       effect.shimmer.setAttribute("opacity", "0");
       return;
     }
-    effect.shimmer.setAttribute("opacity", ".16");
+    effect.shimmer.setAttribute("opacity", ".58");
     effect.band.setAttribute("transform", `translate(${-16 + effect.sweep * 96} 0)`);
   };
   const refreshAccess = () => {
@@ -15438,6 +15450,19 @@ function startMusicPeopleEchoes() {
         effect.arrival = staticMode ? 1 : remembered ? remembered.arrival ?? 1 : 0;
         effect.arrivalDelay = staticMode ? 0 : remembered ? remembered.arrivalDelay || 0
           : index / Math.max(1, capacity - 1) * 600;
+        if (remembered) {
+          const shimmer = remembered.shimmer;
+          effect.firstSweep = shimmer?.firstSweep ?? false;
+          if (shimmer) {
+            effect.wait = shimmer.wait;
+            effect.duration = shimmer.duration;
+            effect.sweep = shimmer.sweep;
+            if (effect.sweep >= 0) {
+              effect.shimmer.setAttribute("opacity", ".58");
+              effect.band.setAttribute("transform", `translate(${-16 + effect.sweep * 96} 0)`);
+            }
+          }
+        }
         wrapper.dataset.echoToken = record.key;
         wrapper.appendChild(button);
       }
