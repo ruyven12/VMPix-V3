@@ -13327,7 +13327,7 @@ function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = [], ve
     setCode: getMusicPersonTaggedShowSetCode(show, matchedShow),
     taggedPhotosLabel: verified && Number.isSafeInteger(show?.tagged_photo_count) ? formatMusicPeopleCount(show.tagged_photo_count, "Tagged Photo") : formatMusicPeopleCount(photos.length, "Loaded Preview"),
     expectedPhotoCount: verified && Number.isSafeInteger(show?.tagged_photo_count) ? show.tagged_photo_count : null,
-    expanded: Boolean(show?.expanded) || (index === 0 && hasRealThumbnails),
+    expanded: false,
     contributors: getMusicPeopleText(show?.contributors),
     notes: getMusicPeopleText(show?.notes),
     thumbnails: photos,
@@ -13371,7 +13371,7 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands = []
         location: getMusicPeopleText(photo.location),
         bandContext: getMusicPeopleText(photo.band_name || photo.bandName),
         taggedPhotosLabel: "",
-        expanded: groups.size === 0,
+        expanded: false,
         contributors: "",
         notes: "",
         thumbnails: [],
@@ -13709,6 +13709,7 @@ function toggleMusicPersonShowCard(card, event = null) {
   if (isExpanded) {
     triggerMusicPersonShowCardHydration(card, { priority: true });
   }
+  syncMusicPersonLegacyShowGroup(card.closest(".person-legacy-show"));
   reportArchiveContentExpansion(event, card, "music", "person", "show_photos", !isExpanded, isExpanded);
 }
 
@@ -14288,7 +14289,7 @@ function hydrateMusicPersonTaggedShowPhotos(data, options = {}) {
 
 function createMusicPersonShowCard(show, personName) {
   const card = document.createElement("article");
-  const isExpanded = Boolean(show.expanded);
+  const isExpanded = false;
   const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
   const albumId = getMusicPersonTaggedShowAlbumId(show);
   card.className = "person-show-card";
@@ -14311,78 +14312,8 @@ function createMusicPersonShowCard(show, personName) {
       ? "idle"
       : "empty";
 
-  const summary = document.createElement("button");
-  summary.className = "person-show-summary";
-  summary.id = "person-show-" + encodeURIComponent(card.dataset.personShowId + "|" + albumId);
-  summary.type = "button";
-  summary.setAttribute("aria-expanded", String(isExpanded));
-  const taggedPhotosLabel = getMusicPeopleText(show.taggedPhotosLabel) || formatMusicPeopleCount(show.taggedPhotos, "Tagged Photo");
-  const bandContextLabel = getMusicPeopleText(show.bandContext) ? `with ${show.bandContext}` : "";
-  summary.setAttribute("aria-label", `${show.title}, ${show.venue}, ${show.location}${bandContextLabel ? `, ${bandContextLabel}` : ""}, ${taggedPhotosLabel}`);
-
-  const date = document.createElement("span");
-  date.className = "person-show-date";
-
-  const month = document.createElement("span");
-  month.className = "person-show-date-month";
-  month.textContent = show.date.month;
-
-  const day = document.createElement("span");
-  day.className = "person-show-date-day";
-  day.textContent = show.date.day;
-
-  const year = document.createElement("span");
-  year.className = "person-show-date-year";
-  year.textContent = show.date.year;
-  date.append(month, day, year);
-
-  const copy = document.createElement("span");
-  copy.className = "person-show-copy";
-
-  const title = document.createElement("span");
-  title.className = "person-show-title";
-  title.textContent = show.title;
-
-  const venue = document.createElement("span");
-  venue.className = "person-show-venue";
-  venue.textContent = [show.venue, show.location].map(getMusicPeopleText).filter(Boolean).join(" - ");
-  copy.append(title, venue);
-
-  const count = document.createElement("span");
-  count.className = "person-show-count";
-  count.textContent = taggedPhotosLabel;
-
-  const toggle = document.createElement("span");
-  toggle.className = "person-show-toggle";
-  toggle.setAttribute("aria-hidden", "true");
-  toggle.textContent = isExpanded ? "-" : "+";
-
-  const actionGroup = document.createElement("span");
-  actionGroup.className = "person-show-action";
-  actionGroup.append(count, toggle);
-
-  summary.append(date, copy, actionGroup);
-  summary.addEventListener("click", (event) => {
-    toggleMusicPersonShowCard(card, event);
-  });
-
-  const action = document.createElement("button");
-  action.className = "person-show-view"; action.type = "button"; action.textContent = "View Set";
-  action.id = getMusicPersonControlId("set-link", card.dataset.personShowId + "|" + albumId);
-  action.dataset.showRoute = getMusicPeopleText(show.showRoute);
-  action.disabled = !action.dataset.showRoute;
-  action.addEventListener("click", event => {
-    event.stopPropagation();
-    const target = action.dataset.showRoute;
-    if (!target) return;
-    const currentRoute = getRouteFromUrl();
-    const relationship = beginArchiveRelationshipAnalytics(event, "music", "person", "set", () => ({
-      source_content_id: findMusicPersonById(activeMusicPersonDetailId || activeMusicPeopleId)?.backend_record?.person_id
-    }));
-    stageArchiveRelationshipAnalytics(relationship, target);
-    navigateToRoute(target, { historyState: { fromPersonDetail: true,
-      personDetailUrl: currentRoute.name === "person-detail" ? currentRoute.canonicalUrl : getMusicPersonRouteUrl(card.dataset.personId) } });
-  });
+  const count = document.createElement("p"); count.className = "person-show-count";
+  count.textContent = getMusicPeopleText(show.taggedPhotosLabel);
 
   const expanded = document.createElement("div");
   expanded.className = "person-show-expanded";
@@ -14423,21 +14354,7 @@ function createMusicPersonShowCard(show, personName) {
   if (notes) {
     expanded.append(notes);
   }
-  const showAction = document.createElement("a");
-  showAction.className = "person-show-detail-link"; showAction.textContent = "Show Detail";
-  showAction.id = getMusicPersonControlId("show-link", card.dataset.personShowId + "|" + albumId);
-  if (show.detailRoute) showAction.href = show.detailRoute; else showAction.hidden = true;
-  showAction.addEventListener("click", event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigateToRoute(showAction.getAttribute("href")); });
-  const venueAction = document.createElement("a");
-  venueAction.className = "person-show-venue-link"; venueAction.textContent = "Venue Detail";
-  venueAction.id = getMusicPersonControlId("venue-link", card.dataset.personShowId + "|" + albumId);
-  if (show.venueId) venueAction.href = getMusicVenueRouteUrl({ venue_id: show.venueId, venue_key: show.venueId });
-  else venueAction.hidden = true;
-  venueAction.addEventListener("click", event => {
-    if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    event.preventDefault(); navigateToRoute(venueAction.getAttribute("href"));
-  });
-  card.append(summary, showAction, venueAction, action, expanded);
+  card.append(count, expanded);
   return card;
 }
 
@@ -14474,7 +14391,7 @@ function getMusicPersonControlId(kind, target) {
 function createMusicPersonConnectionLink(label, url, key = label) {
   const node = document.createElement(url ? "a" : "span"); node.textContent = label;
   if (url) node.id = getMusicPersonControlId("connection", url + "|" + key);
-  if (url) { node.href = url; node.addEventListener("click", event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigateToRoute(url); }); }
+  if (url) { node.href = url; node.addEventListener("click", event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigateToRoute(node.getAttribute("href")); }); }
   return node;
 }
 
@@ -14511,6 +14428,91 @@ function renderMusicPersonConnections(data) {
   return section;
 }
 
+function getMusicPersonLegacyPhotoSummary(shows) {
+  const identities = [];
+  const complete = shows.every(show => {
+    const photos = Array.isArray(show.thumbnails) ? show.thumbnails : [];
+    const keys = photos.map(photo => getMusicPeopleText(photo?.image_key || photo?.imageKey));
+    if (!show.photosComplete || !Number.isSafeInteger(show.expectedPhotoCount)
+      || photos.length !== show.expectedPhotoCount || keys.some(key => !key) || new Set(keys).size !== keys.length) return false;
+    identities.push(...keys); return true;
+  });
+  if (complete) return formatMusicPeopleCount(new Set(identities).size, "Verified Photograph");
+  return shows.map((show, index) => Number.isSafeInteger(show.expectedPhotoCount) && show.expectedPhotoCount >= 0
+    ? "Collection " + (index + 1) + ": " + formatMusicPeopleCount(show.expectedPhotoCount, "Verified Photograph")
+    : "Collection " + (index + 1) + ": photograph total unavailable").join(" · ");
+}
+
+function syncMusicPersonLegacyShowGroup(group) {
+  if (!group) return;
+  const expanded = [...group.querySelectorAll(".person-show-card")].some(card => card.classList.contains("is-expanded"));
+  group.classList.toggle("is-expanded", expanded);
+  group.querySelector("[data-person-show-gallery-toggle]")?.setAttribute("aria-expanded", String(expanded));
+  const panel = group.querySelector("[data-person-show-gallery-panel]");
+  if (panel) panel.hidden = !expanded;
+}
+
+function setMusicPersonLegacyShowExpanded(group, expanded, event = null) {
+  group.querySelectorAll(".person-show-card").forEach(card => {
+    if (card.classList.contains("is-expanded") !== expanded) toggleMusicPersonShowCard(card, event);
+  });
+  syncMusicPersonLegacyShowGroup(group);
+}
+
+function createMusicPersonLegacyShowGroup(shows, personName) {
+  const show = shows[0], group = document.createElement("section");
+  group.className = "person-legacy-show"; group.dataset.personLegacyShow = show.showId;
+  const button = document.createElement("button"); button.type = "button";
+  button.className = "person-legacy-show-title"; button.dataset.personShowGalleryToggle = "";
+  button.id = getMusicPersonControlId("show-gallery", show.showId);
+  button.textContent = show.title; button.setAttribute("aria-expanded", "false");
+  const metadata = document.createElement("p"); metadata.className = "person-legacy-show-meta";
+  metadata.textContent = [getMusicPersonTaggedShowDateLabel(show), show.venue, show.location].filter(Boolean).join(" · ");
+  metadata.hidden = !metadata.textContent;
+  const count = document.createElement("p"); count.className = "person-legacy-show-count";
+  count.textContent = getMusicPersonLegacyPhotoSummary(shows);
+  const actions = document.createElement("div"); actions.className = "person-legacy-show-links";
+  const routes = [...new Set(shows.map(row => row.detailRoute).filter(Boolean))];
+  const venues = [...new Set(shows.map(row => row.venueId).filter(Boolean))];
+  if (routes.length === 1) {
+    const link = createMusicPersonConnectionLink("Show Detail", routes[0], show.showId);
+    link.className = "person-show-detail-link"; link.id = getMusicPersonControlId("show-link", show.showId);
+    actions.append(link);
+  }
+  if (venues.length === 1) {
+    const link = createMusicPersonConnectionLink("Venue Detail", getMusicVenueRouteUrl({ venue_id: venues[0], venue_key: venues[0] }), show.showId);
+    link.className = "person-show-venue-link"; link.id = getMusicPersonControlId("venue-link", show.showId);
+    actions.append(link);
+  }
+  actions.hidden = !actions.childNodes.length;
+  const panel = document.createElement("div"); panel.className = "person-legacy-show-gallery";
+  panel.dataset.personShowGalleryPanel = ""; panel.hidden = true;
+  panel.id = getMusicPersonControlId("show-gallery-panel", show.showId);
+  button.setAttribute("aria-controls", panel.id);
+  shows.forEach(row => {
+    const card = createMusicPersonShowCard(row, personName);
+    card.querySelector(".person-show-count").hidden = shows.length === 1;
+    panel.append(card);
+  });
+  button.addEventListener("click", event => setMusicPersonLegacyShowExpanded(group, !group.classList.contains("is-expanded"), event));
+  group.append(button, metadata, count, actions, panel); return group;
+}
+
+function updateMusicPersonLegacyShowMetadata(retained, fresh) {
+  for (const selector of [".person-legacy-show-title", ".person-legacy-show-meta", ".person-legacy-show-count"]) {
+    const old = retained.querySelector(selector), next = fresh.querySelector(selector);
+    old.textContent = next.textContent; old.hidden = next.hidden;
+  }
+  const actions = retained.querySelector(".person-legacy-show-links"), nextActions = fresh.querySelector(".person-legacy-show-links");
+  for (const className of [".person-show-detail-link", ".person-show-venue-link"]) {
+    const old = actions.querySelector(className), next = nextActions.querySelector(className);
+    if (old && next) old.href = next.href;
+    else if (old) old.remove();
+    else if (next) actions.append(next);
+  }
+  actions.hidden = !actions.childNodes.length;
+}
+
 function renderMusicPersonDetail(data) {
   if (!personDetail) return;
   if (data.state !== "ready") {
@@ -14518,7 +14520,9 @@ function renderMusicPersonDetail(data) {
     renderMusicPersonDetailState(data); return;
   }
   const same = personDetail.dataset.personIdentity === data.personId && personDetail.querySelector("[data-person-note]");
-  const expanded = new Set([...personDetail.querySelectorAll(".person-show-card.is-expanded")].map(card => card.dataset.personShowId + "|" + card.dataset.personShowAlbumId));
+  const preserveGalleries = same && personDetail.dataset.personEntry === v3RouteContext.entry;
+  const expanded = new Set(preserveGalleries ? [...personDetail.querySelectorAll(".person-show-card.is-expanded")].map(card => card.dataset.personShowId + "|" + card.dataset.personShowAlbumId) : []);
+  personDetail.dataset.personEntry = v3RouteContext.entry;
   const top = personDetail.scrollTop, focused = document.activeElement;
   const resonanceFocus = personDetail.querySelector("[data-person-resonance]")?.contains(focused) ? focused.id : "";
   disconnectMusicPersonTaggedShowHydrationObserver();
@@ -14550,13 +14554,8 @@ function renderMusicPersonDetail(data) {
   legacy.dataset.personLegacy = ""; legacy.className = "person-tagged-shows";
   const title = document.createElement("h4"); title.textContent = "Legacy"; legacy.append(title);
   const groups = new Map();
-  data.taggedShows.forEach(show => {
-    if (!groups.has(show.showId)) {
-      const group = document.createElement("section"), heading = document.createElement("h5");
-      group.className = "person-legacy-show"; heading.textContent = show.title; group.append(heading); groups.set(show.showId, group); legacy.append(group);
-    }
-    groups.get(show.showId).append(createMusicPersonShowCard(show, data.name));
-  });
+  data.taggedShows.forEach(show => { if (!groups.has(show.showId)) groups.set(show.showId, []); groups.get(show.showId).push(show); });
+  groups.forEach(shows => legacy.append(createMusicPersonLegacyShowGroup(shows, data.name)));
   if (!data.taggedShows.length) legacy.append(createMusicPersonEmptyState("No documented performances or photographs available."));
   const oldLegacy = personDetail.querySelector("[data-person-legacy]");
   let keepLegacy = false;
@@ -14568,13 +14567,10 @@ function renderMusicPersonDetail(data) {
     if (keepLegacy) newCards.forEach(card => {
       const retained = oldCards.get(key(card)); retained._personShowData = card._personShowData;
       retained.querySelector(".person-show-count").textContent = card.querySelector(".person-show-count").textContent;
-      const action = retained.querySelector(".person-show-view"), fresh = card.querySelector(".person-show-view");
-      action.dataset.showRoute = fresh.dataset.showRoute || ""; action.disabled = fresh.disabled;
-      const link = retained.querySelector(".person-show-detail-link"), newLink = card.querySelector(".person-show-detail-link");
-      link.hidden = newLink.hidden; if (newLink.hasAttribute("href")) link.href = newLink.href;
-      const venueLink = retained.querySelector(".person-show-venue-link"), newVenueLink = card.querySelector(".person-show-venue-link");
-      venueLink.hidden = newVenueLink.hidden;
-      if (newVenueLink.hasAttribute("href")) venueLink.href = newVenueLink.href;
+    });
+    if (keepLegacy) oldLegacy.querySelectorAll(".person-legacy-show").forEach(group => {
+      const fresh = [...legacy.querySelectorAll(".person-legacy-show")].find(node => node.dataset.personLegacyShow === group.dataset.personLegacyShow);
+      if (fresh) updateMusicPersonLegacyShowMetadata(group, fresh);
     });
   }
   const oldResonance = personDetail.querySelector("[data-person-resonance]");
@@ -14589,8 +14585,9 @@ function renderMusicPersonDetail(data) {
   }
   if (same) {
     personDetail.scrollTop = top;
-    personDetail.querySelectorAll("[data-person-legacy] .person-show-card").forEach(card => {
-      if (card.classList.contains("is-expanded") !== expanded.has(card.dataset.personShowId + "|" + card.dataset.personShowAlbumId)) toggleMusicPersonShowCard(card);
+    personDetail.querySelectorAll("[data-person-legacy] .person-legacy-show").forEach(group => {
+      const open = [...group.querySelectorAll(".person-show-card")].some(card => expanded.has(card.dataset.personShowId + "|" + card.dataset.personShowAlbumId));
+      setMusicPersonLegacyShowExpanded(group, open);
     });
     if (resonanceFocus && document.activeElement === document.body) {
       const target = document.getElementById(resonanceFocus);
@@ -20695,8 +20692,9 @@ function restoreMusicResumeState(route,ui) {
       if(Array.isArray(ui.connections))personDetail.querySelectorAll('details[data-person-connection]').forEach(node=>node.open=ui.connections.includes(node.dataset.personConnection));
       if(Array.isArray(ui.expanded)){
         const expanded=new Set(ui.expanded.filter(key=>typeof key==='string'&&key.length<=300).slice(0,100));
-        personDetail.querySelectorAll('.person-show-card').forEach(card=>{
-          if(card.classList.contains('is-expanded')!==expanded.has(card.dataset.personShowId+'|'+card.dataset.personShowAlbumId))toggleMusicPersonShowCard(card);
+        personDetail.querySelectorAll('.person-legacy-show').forEach(group=>{
+          const open=[...group.querySelectorAll('.person-show-card')].some(card=>expanded.has(card.dataset.personShowId+'|'+card.dataset.personShowAlbumId));
+          setMusicPersonLegacyShowExpanded(group,open);
         });
       }
       const focus = document.getElementById(v3Text(ui.focus));

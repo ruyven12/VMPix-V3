@@ -288,6 +288,7 @@ test('photo-only Legacy evidence splits one Show across explicit albums without 
   load(ctx, 'getMusicPersonTaggedShowsFromMatchedPhotos');
   const groups = ctx.getMusicPersonTaggedShowsFromMatchedPhotos({});
   assert.equal(groups.length, 2);
+  assert(groups.every(group => group.expanded === false));
   assert.equal(groups[0].showId, '17'); assert.equal(groups[1].showId, '17');
   assert.equal(groups[0].albumId, 'A'); assert.equal(groups[1].albumId, 'B');
   assert.equal(groups[0].thumbnails[0].image_key, 'a1'); assert.equal(groups[1].thumbnails[0].image_key, 'b1');
@@ -357,6 +358,7 @@ function resonanceFixture(state = 'live') {
       append(...children) { this.children.push(...children); },
       replaceChildren(...children) { this.children = children; },
       addEventListener(name, handler) { this.listeners[name] = handler; },
+      getAttribute(name) { return this[name] ?? null; },
       querySelectorAll() { return []; }, contains() { return false; } };
     Object.defineProperty(value, 'childNodes', { get() { return this.children; } });
     created.push(value); return value;
@@ -404,7 +406,7 @@ test('retained Resonance wrapper follows late no-band/populated/no-band data wit
       '[data-person-legacy]': legacy })[selector] || null; },
     querySelectorAll() { return []; }, replaceChildren() { throw Error('Identity replaced'); },
     append() { throw Error('Retained wrappers replaced'); } };
-  Object.assign(f.ctx, { document: { ...f.ctx.document, activeElement: body, body }, personDetail: root,
+  Object.assign(f.ctx, { document: { ...f.ctx.document, activeElement: body, body }, personDetail: root, v3RouteContext: { entry: 'visit' },
     disconnectMusicPersonTaggedShowHydrationObserver() {}, musicPersonTaggedShowHydrationToken: 1,
     createMusicPersonPillList: () => f.node('div'), createMusicPersonArchiveBlock: () => f.node('dl'),
     createMusicPersonEmptyState: () => f.node('p'), hydrateMusicPersonTaggedShowPhotos() {},
@@ -439,9 +441,9 @@ test('Person resume waits through covered-sweep and failed focus, restoring expa
     musicBandsIndex: { dataset: { bandsDataState: 'live' } },
     musicPersonDetailArchiveRequests: new Map(), normalizeMusicPersonId: String,
     personDetail: { isConnected: true, clientHeight: 700, closest: () => blocked ? {} : null,
-      contains: node => node === focus, querySelectorAll: selector => selector === '.person-show-card' ? [card] : [] },
+      contains: node => node === focus, querySelectorAll: selector => selector === '.person-legacy-show' ? [{ querySelectorAll: () => [card] }] : [] },
     getComputedStyle: () => ({ visibility: 'visible' }), v3Text: value => value || '',
-    toggleMusicPersonShowCard() { expanded = !expanded; } });
+    setMusicPersonLegacyShowExpanded(group, value) { expanded = value; } });
   load(ctx, 'restoreMusicResumeState');
   const route = { name: 'person-detail', personId: '1' }, ui = { focus: 'person-connection-1', expanded: ['S1|A1'] };
   assert.equal(ctx.restoreMusicResumeState(route, ui), false);
@@ -451,4 +453,161 @@ test('Person resume waits through covered-sweep and failed focus, restoring expa
   focusAllowed = true;
   assert.equal(ctx.restoreMusicResumeState(route, ui), true);
   assert.equal(doc.activeElement, focus);
+});
+
+function legacyFixture() {
+  const document = { activeElement: {}, body: {}, documentElement: { hasAttribute: () => false } };
+  function matches(node, selector) {
+    if (selector.includes(',')) return selector.split(',').some(part => matches(node, part.trim()));
+    const parts = selector.split(/\s+/);
+    if (parts.length > 1) {
+      if (!matches(node, parts.pop())) return false;
+      let ancestor = node.parentElement;
+      while (parts.length) { const part = parts.pop(); while (ancestor && !matches(ancestor, part)) ancestor = ancestor.parentElement; if (!ancestor) return false; ancestor = ancestor.parentElement; }
+      return true;
+    }
+    if (selector === '[hidden]') return node.hidden;
+    if (selector.startsWith('.')) return selector.slice(1).split('.').every(name => node.className.split(/\s+/).includes(name));
+    if (selector.startsWith('#')) return node.id === selector.slice(1);
+    const attr = selector.match(/^\[data-([a-z-]+)\]$/);
+    return attr ? Object.prototype.hasOwnProperty.call(node.dataset, attr[1].replace(/-([a-z])/g, (_, char) => char.toUpperCase())) : node.tag === selector;
+  }
+  function node(tag) {
+    const value = { tag, className: '', id: '', dataset: {}, children: [], parentElement: null,
+      hidden: false, textContent: '', attributes: {}, events: {}, isConnected: true, clientHeight: 700,
+      append(...items) { items.forEach(item => { if (item && typeof item === 'object') { item.remove(); item.parentElement = this; } this.children.push(item); }); },
+      replaceChildren(...items) { this.children.forEach(item => { if (item && typeof item === 'object') item.parentElement = null; }); this.children = []; this.append(...items); },
+      remove() { if (this.parentElement) { this.parentElement.children = this.parentElement.children.filter(item => item !== this); this.parentElement = null; } },
+      replaceWith(next) { if (!this.parentElement) return; const parent = this.parentElement, index = parent.children.indexOf(this); this.parentElement = null; next.parentElement = parent; parent.children.splice(index, 1, next); },
+      querySelectorAll(selector) { const found = []; const visit = item => { if (!item || typeof item !== 'object') return; if (matches(item, selector)) found.push(item); item.children.forEach(visit); }; this.children.forEach(visit); return found; },
+      querySelector(selector) { return this.querySelectorAll(selector)[0] || null; },
+      closest(selector) { for (let item = this; item; item = item.parentElement) if (matches(item, selector)) return item; return null; },
+      contains(target) { return target === this || this.children.some(item => item && typeof item === 'object' && item.contains(target)); },
+      setAttribute(name, value) { this.attributes[name] = value; },
+      getAttribute(name) { return name === 'href' ? this.href : this.attributes[name] ?? null; },
+      hasAttribute(name) { return name === 'href' ? !!this.href : name in this.attributes; },
+      addEventListener(name, handler) { this.events[name] = handler; },
+      focus() { document.activeElement = this; }
+    };
+    value.classList = { contains: name => value.className.split(/\s+/).includes(name), toggle(name, enabled) {
+      const names = new Set(value.className.split(/\s+/).filter(Boolean));
+      if (enabled) names.add(name); else names.delete(name); value.className = [...names].join(' ');
+    } };
+    Object.defineProperty(value, 'childNodes', { get() { return this.children; } });
+    return value;
+  }
+  const root = node('article'); root.scrollTop = 125;
+  document.createElement = node; document.getElementById = id => id ? root.querySelector('#' + id) : null;
+  document.activeElement = document.body;
+  const ctx = vm.createContext({ document, Map, Set, Number, Array,
+    getMusicPeopleText: value => String(value ?? ''),
+    formatMusicPeopleCount: (count, label) => count + ' ' + label,
+    getMusicPersonTaggedShowAlbumId: row => row.albumId || row.album_id,
+    getMusicPersonTaggedLightboxPhotos: photos => photos,
+    MUSIC_PERSON_TAGGED_SHOW_PREVIEW_LIMIT: 24,
+    activeMusicPersonDetailId: '1', activeMusicPeopleId: '1',
+    getMusicPersonControlId: (kind, key) => 'person-' + kind + '-1|' + key,
+    getMusicVenueRouteUrl: venue => '/music/venues/' + venue.venue_id,
+    getMusicPersonTaggedShowDateLabel: () => 'Sep 26, 2025',
+    createMusicPersonTaggedThumb: (photo, options) => Object.assign(node('button'), { photo, options }),
+    createMusicPersonTaggedPhotoState: () => node('p'), createMusicPersonEmptyState: () => node('p'),
+    triggerMusicPersonShowCardHydration() {}, reportArchiveContentExpansion() {},
+    navigateToRoute() {}
+  });
+  ['createMusicPersonConnectionLink', 'getMusicPersonLegacyPhotoSummary', 'syncMusicPersonLegacyShowGroup',
+    'setMusicPersonLegacyShowExpanded', 'toggleMusicPersonShowCard', 'createMusicPersonShowCard',
+    'createMusicPersonLegacyShowGroup', 'updateMusicPersonLegacyShowMetadata'].forEach(name => load(ctx, name));
+  const show = (album, keys) => ({ showId: 'S1', albumId: album, title: 'One Show', venue: 'Venue',
+    venueId: 'mv_venue', location: 'City', detailRoute: '/music/shows/S1',
+    expectedPhotoCount: keys.length, photosComplete: true, expanded: true,
+    taggedPhotosLabel: keys.length + ' Tagged Photos', thumbnails: keys.map(key => ({ image_key: key })) });
+  return { ctx, root, node, show };
+}
+test('Legacy shows start collapsed with one title trigger/action row while album galleries keep separate identities', () => {
+  const f = legacyFixture(), rows = [f.show('A', ['a', 'shared']), f.show('B', ['b', 'shared'])];
+  const group = f.ctx.createMusicPersonLegacyShowGroup(rows, 'Person'); f.root.append(group);
+  const button = group.querySelector('[data-person-show-gallery-toggle]'), panel = group.querySelector('[data-person-show-gallery-panel]');
+  assert.equal(button.textContent, 'One Show'); assert.equal(button.getAttribute('aria-expanded'), 'false');
+  assert.equal(panel.hidden, true); assert.equal(group.querySelectorAll('.person-show-summary').length, 0);
+  assert.equal(group.querySelectorAll('.person-show-view').length, 0);
+  assert.equal(group.querySelectorAll('.person-show-detail-link').length, 1);
+  assert.equal(group.querySelectorAll('.person-show-venue-link').length, 1);
+  assert.equal(group.querySelector('.person-legacy-show-count').textContent, '3 Verified Photograph');
+  const cards = group.querySelectorAll('.person-show-card');
+  assert.deepEqual(cards.map(card => card.dataset.personShowAlbumId), ['A', 'B']);
+  assert(cards.every(card => !card.classList.contains('is-expanded')));
+  assert.equal(cards[0].querySelector('.person-show-expanded').children[0].children[0].options.show.albumId, 'A');
+  assert.equal(cards[1].querySelector('.person-show-expanded').children[0].children[0].options.show.albumId, 'B');
+  button.events.click({});
+  assert.equal(panel.hidden, false); assert.equal(button.getAttribute('aria-expanded'), 'true');
+  assert(cards.every(card => card.classList.contains('is-expanded')));
+  button.events.click({});
+  assert.equal(panel.hidden, true); assert(cards.every(card => !card.classList.contains('is-expanded')));
+});
+test('Show photo summary refuses URL-only identities and incomplete unions without summing collection counts', () => {
+  const f = legacyFixture();
+  const urlOnly = { ...f.show('A', ['a']), thumbnails: [{ large_url: 'https://fixture.invalid/a.jpg' }] };
+  assert.equal(f.ctx.getMusicPersonLegacyPhotoSummary([urlOnly]), 'Collection 1: 1 Verified Photograph');
+  const partial = { ...f.show('A', ['a']), photosComplete: false, expectedPhotoCount: 100 };
+  const unknown = { ...f.show('B', ['b']), photosComplete: false, expectedPhotoCount: null };
+  const text = f.ctx.getMusicPersonLegacyPhotoSummary([partial, unknown]);
+  assert.equal(text, 'Collection 1: 100 Verified Photograph · Collection 2: photograph total unavailable');
+  const repeated = { ...f.show('A', ['a', 'a']), expectedPhotoCount: 2 };
+  assert.equal(f.ctx.getMusicPersonLegacyPhotoSummary([repeated]), 'Collection 1: 2 Verified Photograph');
+});
+test('same-entry Legacy enrichment preserves expansion, fresh entry collapses, and one saved album restores the whole Show', () => {
+  const f = legacyFixture(), rows = [f.show('A', ['a']), f.show('B', ['b'])];
+  const hero = f.node('section'); hero.dataset.personNote = '';
+  const copy = f.node('div'); copy.className = 'person-detail-copy';
+  const name = f.node('h3'); const pills = f.node('div'); pills.className = 'person-detail-pill-list'; copy.append(name, pills);
+  const archive = f.node('dl'); archive.className = 'person-detail-archive-data'; hero.append(copy, archive);
+  const resonance = f.node('section'); resonance.dataset.personResonance = '';
+  const legacy = f.node('section'); legacy.dataset.personLegacy = '';
+  const group = f.ctx.createMusicPersonLegacyShowGroup(rows, 'Person'); legacy.append(group); f.root.append(hero, resonance, legacy);
+  f.root.dataset.personIdentity = '1'; f.root.dataset.personEntry = 'visit-a';
+  Object.assign(f.ctx, { personDetail: f.root, v3RouteContext: { entry: 'visit-a' }, musicPersonTaggedShowHydrationToken: 1,
+    disconnectMusicPersonTaggedShowHydrationObserver() {}, startMusicPersonIdentityMotion() {},
+    createMusicPersonPillList: () => Object.assign(f.node('div'), { className: 'person-detail-pill-list' }),
+    createMusicPersonArchiveBlock: () => f.node('dl'),
+    renderMusicPersonConnections: () => Object.assign(f.node('section'), { dataset: { personResonance: '' } }),
+    hydrateMusicPersonTaggedShowPhotos() {},
+    musicShowsSetsRequest: null, musicShowsSetsDataState: 'live', musicPeopleIndexDataState: 'live',
+    musicBandsIndex: { dataset: { bandsDataState: 'live' } }, musicPersonDetailArchiveRequests: new Map(),
+    normalizeMusicPersonId: String, v3Text: value => value || '', getComputedStyle: () => ({ visibility: 'visible' }) });
+  load(f.ctx, 'renderMusicPersonDetail'); load(f.ctx, 'restoreMusicResumeState');
+  const data = { state: 'ready', personId: '1', name: 'Person', aliases: [], archiveRows: [], taggedShows: rows };
+  f.ctx.setMusicPersonLegacyShowExpanded(group, true);
+  f.ctx.renderMusicPersonDetail(data);
+  assert(group.classList.contains('is-expanded'));
+  f.ctx.v3RouteContext = { entry: 'visit-b' };
+  f.ctx.renderMusicPersonDetail(data);
+  assert(!group.classList.contains('is-expanded'));
+  const restored = f.ctx.restoreMusicResumeState({ name: 'person-detail', personId: '1' }, { expanded: ['S1|B'] });
+  assert.equal(restored, true); assert(group.classList.contains('is-expanded'));
+  assert(group.querySelectorAll('.person-show-card').every(card => card.classList.contains('is-expanded')));
+  assert.equal(f.root.scrollTop, 125);
+});
+test('retained Person links activate their current canonical href after enrichment', () => {
+  const f = resonanceFixture();
+  const link = f.ctx.createMusicPersonConnectionLink('Show Detail', '/music/shows/old', 'S1');
+  link.href = '/music/shows/current';
+  link.listeners.click({ button: 0, preventDefault() {} });
+  assert.equal(f.navigation[0], '/music/shows/current');
+});
+
+test('normalized native Show rows collapse even when source data or first-photo previews request expansion', () => {
+  const f = legacyFixture();
+  Object.assign(f.ctx, {
+    getMusicPersonTaggedShowMatchedShow: () => null, getMusicPeopleCountValue: (...values) => values.find(Number.isFinite) || 0,
+    getMusicPersonMatchedPhotoUrl: () => 'https://fixture.invalid/photo.jpg',
+    compareMusicPersonMatchedPhotosByOriginalDate: () => 0,
+    getMusicPersonTaggedPhotoIdentity: photo => photo.image_key,
+    getMusicPersonShowDateParts: () => ({}), getMusicPersonTaggedShowVenue: () => '',
+    getMusicPersonTaggedShowRoute: () => '', getMusicPersonTaggedShowSetCode: () => '',
+    createMusicPeopleSlug: String
+  });
+  load(f.ctx, 'getMusicPersonTaggedShowPhotos'); load(f.ctx, 'normalizeMusicPersonTaggedShowRow');
+  const row = f.ctx.normalizeMusicPersonTaggedShowRow({ show_id: 'S1', album_id: 'A', title: 'Show',
+    expanded: true, tagged_photo_count: 1, matched_photos: [{ image_key: 'one' }] }, 0, [], true);
+  assert.equal(row.expanded, false); assert.equal(row.photosComplete, true);
 });

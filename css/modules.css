@@ -35787,3 +35787,25 @@ html[data-v3-booting] .music-people-loading :is(.music-people-loading-motif, .mu
 @media (prefers-reduced-motion: reduce) {
   .person-detail-screen [data-person-signature][data-signature-id] { animation: none; }
 }
+
+/* M6.2B: one collapsed, centered gallery header per Show; albums retain their own data. */
+.person-detail-screen .person-legacy-show {
+  display: grid; gap: .45rem; min-width: 0; padding: .75rem;
+  border: 1px solid rgba(225,197,150,.2); border-radius: .6rem; background: rgba(9,6,15,.74);
+}
+.person-detail-screen .person-legacy-show-title {
+  width: 100%; min-height: 44px; padding: .5rem; border: 0; background: none;
+  color: #eee4f3; font: inherit; font-size: clamp(1rem, 3vw, 1.2rem); line-height: 1.4;
+  text-align: center; overflow-wrap: anywhere; cursor: pointer;
+}
+.person-detail-screen :is(.person-legacy-show-meta, .person-legacy-show-count) {
+  margin: 0; color: #d4bedc; font-size: .86rem; line-height: 1.5; text-align: center; overflow-wrap: anywhere;
+}
+.person-detail-screen .person-legacy-show-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .25rem 1rem; }
+.person-detail-screen .person-legacy-show-gallery { display: grid; gap: .85rem; min-width: 0; }
+.person-detail-screen :is(.person-legacy-show-links, .person-legacy-show-gallery)[hidden] { display: none; }
+.person-detail-screen .person-legacy-show .person-show-card { display: block; padding: 0; border: 0; background: none; }
+.person-detail-screen .person-legacy-show .person-show-expanded { padding: 0; border: 0; margin: 0; }
+.person-detail-screen .person-legacy-show .person-show-expanded[hidden] { display: none; }
+.person-detail-screen .person-legacy-show .person-show-count { display: block; position: static; margin: .2rem 0 .5rem; border: 0; background: none; padding: 0; min-height: 0; text-align: center; font-size: .82rem; color: #d4bedc; }
+.person-detail-screen .person-legacy-show .person-show-count[hidden] { display: none; }
