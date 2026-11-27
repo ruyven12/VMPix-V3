@@ -35809,3 +35809,14 @@ html[data-v3-booting] .music-people-loading :is(.music-people-loading-motif, .mu
 .person-detail-screen .person-legacy-show .person-show-expanded[hidden] { display: none; }
 .person-detail-screen .person-legacy-show .person-show-count { display: block; position: static; margin: .2rem 0 .5rem; border: 0; background: none; padding: 0; min-height: 0; text-align: center; font-size: .82rem; color: #d4bedc; }
 .person-detail-screen .person-legacy-show .person-show-count[hidden] { display: none; }
+
+/* M6.2C: the whole Show summary toggles one four-photo preview. */
+.person-detail-screen .person-legacy-show-title { display: grid; gap: .3rem; }
+.person-detail-screen .person-legacy-show-name { color: #eee4f3; }
+.person-detail-screen .person-show-more {
+  justify-self: center; min-height: 44px; padding: .5rem 1rem; border: 1px solid rgba(225,197,150,.24);
+  border-radius: .45rem; background: rgba(9,6,15,.82); color: #e1c596; font: inherit; cursor: pointer;
+}
+.person-detail-screen .person-show-more-status { margin: 0; color: #d4bedc; text-align: center; line-height: 1.5; }
+.person-detail-screen .person-show-more[hidden], .person-detail-screen .person-show-more-status[hidden],
+.person-detail-screen .person-legacy-show .person-show-card[hidden] { display: none; }

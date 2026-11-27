@@ -478,6 +478,7 @@ function legacyFixture() {
       append(...items) { items.forEach(item => { if (item && typeof item === 'object') { item.remove(); item.parentElement = this; } this.children.push(item); }); },
       replaceChildren(...items) { this.children.forEach(item => { if (item && typeof item === 'object') item.parentElement = null; }); this.children = []; this.append(...items); },
       remove() { if (this.parentElement) { this.parentElement.children = this.parentElement.children.filter(item => item !== this); this.parentElement = null; } },
+      insertBefore(next, reference) { if (next === reference) return; next.remove(); next.parentElement = this; const index = reference ? this.children.indexOf(reference) : -1; if (index < 0) this.children.push(next); else this.children.splice(index, 0, next); },
       replaceWith(next) { if (!this.parentElement) return; const parent = this.parentElement, index = parent.children.indexOf(this); this.parentElement = null; next.parentElement = parent; parent.children.splice(index, 1, next); },
       querySelectorAll(selector) { const found = []; const visit = item => { if (!item || typeof item !== 'object') return; if (matches(item, selector)) found.push(item); item.children.forEach(visit); }; this.children.forEach(visit); return found; },
       querySelector(selector) { return this.querySelectorAll(selector)[0] || null; },
@@ -499,7 +500,15 @@ function legacyFixture() {
   const root = node('article'); root.scrollTop = 125;
   document.createElement = node; document.getElementById = id => id ? root.querySelector('#' + id) : null;
   document.activeElement = document.body;
-  const ctx = vm.createContext({ document, Map, Set, Number, Array,
+  const ctx = vm.createContext({ document, Map, Set, Number, Array, Promise, v3RouteContext: { entry: 'fixture' },
+    fetch() { throw Error("Unexpected direct network request"); },
+    musicPersonTaggedShowHydrationToken: 7, musicPersonTaggedShowHydrationCache: new Map(),
+    getRouteFromUrl: () => ({ name: 'person-detail', personId: '1' }),
+    isMusicPersonTaggedShowHydrationCurrent: () => true, isLightboxVisible: () => false,
+    getMusicPersonTaggedShowHydrationContext: card => ({ personId: card.dataset.personId, personName: card.dataset.personName, showId: card.dataset.personShowId, albumId: card.dataset.personShowAlbumId }),
+    getMusicPersonTaggedShowHydrationKey: context => context.albumId,
+    getMusicPersonMatchedPhotoUrl: photo => photo.thumbnail_url || 'https://fixture.invalid/photo.jpg',
+    getMusicPersonMatchedPhotoLightboxUrl: photo => photo.large_url || 'https://fixture.invalid/large.jpg',
     getMusicPeopleText: value => String(value ?? ''),
     formatMusicPeopleCount: (count, label) => count + ' ' + label,
     getMusicPersonTaggedShowAlbumId: row => row.albumId || row.album_id,
@@ -509,12 +518,14 @@ function legacyFixture() {
     getMusicPersonControlId: (kind, key) => 'person-' + kind + '-1|' + key,
     getMusicVenueRouteUrl: venue => '/music/venues/' + venue.venue_id,
     getMusicPersonTaggedShowDateLabel: () => 'Sep 26, 2025',
-    createMusicPersonTaggedThumb: (photo, options) => Object.assign(node('button'), { photo, options }),
+    createMusicPersonTaggedThumb: (photo, options) => Object.assign(node('button'), { className: 'person-show-tagged-thumb', photo, options }),
     createMusicPersonTaggedPhotoState: () => node('p'), createMusicPersonEmptyState: () => node('p'),
     triggerMusicPersonShowCardHydration() {}, reportArchiveContentExpansion() {},
     navigateToRoute() {}
   });
-  ['createMusicPersonConnectionLink', 'getMusicPersonLegacyPhotoSummary', 'syncMusicPersonLegacyShowGroup',
+  ['createMusicPersonConnectionLink', 'getMusicPersonStablePhotoKey', 'isMusicPersonCompletePhotoCollection',
+    'getMusicPersonLegacyGalleryState', 'getMusicPersonLegacyInventory', 'renderMusicPersonLegacyPreview',
+    'showMoreMusicPersonLegacyPhotos', 'getMusicPersonLegacyPhotoSummary', 'syncMusicPersonLegacyShowGroup',
     'setMusicPersonLegacyShowExpanded', 'toggleMusicPersonShowCard', 'createMusicPersonShowCard',
     'createMusicPersonLegacyShowGroup', 'updateMusicPersonLegacyShowMetadata'].forEach(name => load(ctx, name));
   const show = (album, keys) => ({ showId: 'S1', albumId: album, title: 'One Show', venue: 'Venue',
@@ -527,7 +538,7 @@ test('Legacy shows start collapsed with one title trigger/action row while album
   const f = legacyFixture(), rows = [f.show('A', ['a', 'shared']), f.show('B', ['b', 'shared'])];
   const group = f.ctx.createMusicPersonLegacyShowGroup(rows, 'Person'); f.root.append(group);
   const button = group.querySelector('[data-person-show-gallery-toggle]'), panel = group.querySelector('[data-person-show-gallery-panel]');
-  assert.equal(button.textContent, 'One Show'); assert.equal(button.getAttribute('aria-expanded'), 'false');
+  assert.equal(button.querySelector('.person-legacy-show-name').textContent, 'One Show'); assert.equal(button.getAttribute('aria-expanded'), 'false');
   assert.equal(panel.hidden, true); assert.equal(group.querySelectorAll('.person-show-summary').length, 0);
   assert.equal(group.querySelectorAll('.person-show-view').length, 0);
   assert.equal(group.querySelectorAll('.person-show-detail-link').length, 1);
@@ -610,4 +621,162 @@ test('normalized native Show rows collapse even when source data or first-photo 
   const row = f.ctx.normalizeMusicPersonTaggedShowRow({ show_id: 'S1', album_id: 'A', title: 'Show',
     expanded: true, tagged_photo_count: 1, matched_photos: [{ image_key: 'one' }] }, 0, [], true);
   assert.equal(row.expanded, false); assert.equal(row.photosComplete, true);
+});
+
+function photoKeys(count, prefix = 'p') { return Array.from({ length: count }, (_, i) => prefix + (i + 1)); }
+function visibleLegacyThumbs(group) { return group.querySelectorAll('.person-show-tagged-thumb'); }
+function prepareMore(f, rows) {
+  const group = f.ctx.createMusicPersonLegacyShowGroup(rows, 'Person'); f.root.append(group);
+  f.ctx.setMusicPersonLegacyShowExpanded(group, true);
+  group.querySelector('[data-person-show-more]').focus(); return group;
+}
+test('complete19 Show has one full-summary toggle and four keyed previews; More reveals15 lazily without requests', async () => {
+  const f = legacyFixture(), group = prepareMore(f, [f.show('A', photoKeys(19))]);
+  f.ctx.requestMusicPersonTaggedShowMatchedPhotos = () => { throw Error('Complete DTO must not fetch'); };
+  const button = group.querySelector('[data-person-show-gallery-toggle]'), more = group.querySelector('[data-person-show-more]');
+  assert(button.querySelector('.person-legacy-show-name')); assert(button.querySelector('.person-legacy-show-meta'));
+  assert(button.querySelector('.person-legacy-show-count'));
+  assert.equal(button.getAttribute('aria-labelledby').split(' ').length, 3);
+  const original = visibleLegacyThumbs(group); assert.equal(original.length, 4);
+  assert.equal(more.textContent, 'Show More (15 Remaining)');
+  assert.equal(await f.ctx.showMoreMusicPersonLegacyPhotos(group), true);
+  const all = visibleLegacyThumbs(group); assert.equal(all.length, 19);
+  original.forEach((node, i) => assert.equal(all[i], node));
+  assert(all.slice(4).every(node => node.options.lazy === true));
+  assert.equal(all[4].options.lightboxPhotos.length, 19);
+  assert.equal(f.ctx.document.activeElement, all[4]); assert.equal(more.hidden, true);
+});
+test('Show-wide four budget deduplicates overlap and keeps owner-album lightboxes isolated', async () => {
+  const f = legacyFixture(), group = prepareMore(f, [f.show('A', ['a1', 'shared', 'a3']), f.show('B', ['b1', 'shared', 'b3', 'b4'])]);
+  const other = f.ctx.createMusicPersonLegacyShowGroup([{ ...f.show('C', photoKeys(9, 'c')), showId: 'S2' }], 'Person'); f.root.append(other);
+  assert.equal(visibleLegacyThumbs(group).length, 4); assert.equal(visibleLegacyThumbs(other).length, 4);
+  assert.equal(group.querySelector('[data-person-show-more]').textContent, 'Show More (2 Remaining)');
+  await f.ctx.showMoreMusicPersonLegacyPhotos(group);
+  const all = visibleLegacyThumbs(group); assert.equal(all.length, 6);
+  assert.equal(all.filter(node => node.photo.image_key === 'shared').length, 1);
+  const b = all.find(node => node.photo.image_key === 'b3');
+  assert.equal(b.options.show.albumId, 'B'); assert.equal(b.options.lightboxPhotos.length, 4);
+  assert.equal(visibleLegacyThumbs(other).length, 4);
+});
+test('normalized synthetic/malformed identities cannot certify totals or discard an unverifiable preview', () => {
+  const f = legacyFixture();
+  assert.equal(f.ctx.getMusicPersonStablePhotoKey({ imageKey: 'album-photo-1', analyticsImageKey: '' }), '');
+  assert.equal(f.ctx.getMusicPersonStablePhotoKey({ image_key: {} }), '');
+  assert.equal(f.ctx.getMusicPersonStablePhotoKey({ imageKey: false }), '');
+  assert.equal(f.ctx.isMusicPersonCompletePhotoCollection([], { expectedPhotoCount: null,
+    thumbnails: [{ imageKey: 'album-photo-1', analyticsImageKey: '', large_url: 'https://fixture.invalid/a.jpg' }] }), false);
+  const row = { ...f.show('A', ['one']), thumbnails: [{ imageKey: 'album-photo-1', analyticsImageKey: '' }], photosComplete: true };
+  const group = prepareMore(f, [row]);
+  assert.equal(group.querySelector('[data-person-show-more]').textContent, 'Show More');
+});
+test('incomplete More uses complete personal caption pages, dedupes busy activation, and never includes other people', async () => {
+  const f = legacyFixture(), partial = { ...f.show('A', photoKeys(4)), photosComplete: false, expectedPhotoCount: 19 };
+  const group = prepareMore(f, [partial]), calls = [];
+  const people = photoKeys(19).map(image_key => ({ image_key, caption: 'Person', thumbnail_url: 'https://fixture.invalid/' + image_key }));
+  const others = photoKeys(21, 'other').map(image_key => ({ image_key, caption: 'Someone Else', thumbnail_url: 'https://fixture.invalid/' + image_key }));
+  const pages = [{ photos: [...people.slice(0,10), ...others.slice(0,15)], hasMore: true, nextStart: 26 },
+    { photos: [...people.slice(10), ...others.slice(15)], hasMore: false }];
+  Object.assign(f.ctx, { MUSIC_SMUGMUG_ALBUM_PHOTOS_MAX_PAGES: 4, MUSIC_SMUGMUG_ALBUM_PHOTOS_PAGE_LIMIT: 25,
+    musicPersonTaggedShowHydrationRequests: new Map(),
+    enqueueMusicPersonTaggedShowHydration: task => Promise.resolve().then(task),
+    getUniqueMusicAlbumPhotos: rows => [...new Map(rows.map(row => [row.image_key, row])).values()],
+    compareMusicPersonMatchedPhotosByOriginalDate: () => 0,
+    requestMusicSmugmugAlbumPhotosPage: async (album, limit, start) => { calls.push([album, limit, start]); return pages[start === 1 ? 0 : 1]; } });
+  ['getMusicPersonCaptionNameParts', 'doesMusicPersonCaptionMatch', 'getMusicPersonTaggedPhotoIdentity'].forEach(name => load(f.ctx, name));
+  const a = source.indexOf('async function requestMusicPersonTaggedShowMatchedPhotos('), b = source.indexOf('\nfunction setMusicPersonShowCardTaggedPhotoState', a);
+  vm.runInContext(source.slice(a,b), f.ctx);
+  let outcome; const fetchAll = f.ctx.requestMusicPersonTaggedShowMatchedPhotos;
+  f.ctx.requestMusicPersonTaggedShowMatchedPhotos = (...args) => fetchAll(...args).then(result => { outcome = result; return result; }, error => { outcome = { message: error.message }; throw error; });
+  const request = f.ctx.showMoreMusicPersonLegacyPhotos(group);
+  assert.equal(f.ctx.showMoreMusicPersonLegacyPhotos(group), request);
+  assert.equal(group.querySelector('[data-person-show-more]').getAttribute('aria-disabled'), 'true');
+  assert.equal(await request, true, JSON.stringify({ calls, complete: outcome?.isComplete, count: outcome?.matchedPhotos?.length, error: outcome?.message }));
+  assert.deepEqual(calls, [['A',25,1], ['A',25,26]]);
+  assert.equal(visibleLegacyThumbs(group).length, 19);
+  assert(f.ctx.getMusicPersonLegacyInventory(group).items.every(item => item.photo.caption === 'Person'));
+  assert(visibleLegacyThumbs(group).every(node => !node._personLegacyPhotoKey.includes('other')));
+});
+test('More rejects missing known previews and preserves original four nodes with truthful Retry', async () => {
+  const f = legacyFixture(), group = prepareMore(f, [{ ...f.show('A', photoKeys(4)), expectedPhotoCount: 19, photosComplete: false }]);
+  const original = visibleLegacyThumbs(group);
+  f.ctx.requestMusicPersonTaggedShowMatchedPhotos = async () => ({ isComplete: true, matchedPhotos: photoKeys(19, 'different').map(image_key => ({ image_key })) });
+  assert.equal(await f.ctx.showMoreMusicPersonLegacyPhotos(group), false);
+  assert.deepEqual(visibleLegacyThumbs(group), original);
+  assert.equal(group.querySelector('[data-person-show-more]').textContent, 'Retry Show More');
+  assert.equal(group._personGalleryState.request, null);
+  f.ctx.requestMusicPersonTaggedShowMatchedPhotos = async () => ({ isComplete: true, matchedPhotos: photoKeys(19).map(image_key => ({ image_key })) });
+  assert.equal(await f.ctx.showMoreMusicPersonLegacyPhotos(group), true);
+  assert.equal(visibleLegacyThumbs(group).length, 19);
+});
+test('late More completion cannot steal focus after collapse and clears stale busy state for same-entry Back', async () => {
+  const f = legacyFixture(), group = prepareMore(f, [{ ...f.show('A', photoKeys(4)), expectedPhotoCount: 19, photosComplete: false }]);
+  let resolve;
+  f.ctx.requestMusicPersonTaggedShowMatchedPhotos = () => new Promise(done => { resolve = done; });
+  const first = f.ctx.showMoreMusicPersonLegacyPhotos(group);
+  const owner = f.ctx.v3RouteContext;
+  f.ctx.v3RouteContext = { entry: 'other' };
+  resolve({ isComplete: true, matchedPhotos: photoKeys(19).map(image_key => ({ image_key })) });
+  assert.equal(await first, false); assert.equal(group._personGalleryState.request, null);
+  assert.equal(visibleLegacyThumbs(group).length, 4);
+  f.ctx.v3RouteContext = owner;
+  const second = f.ctx.showMoreMusicPersonLegacyPhotos(group);
+  f.ctx.setMusicPersonLegacyShowExpanded(group, false);
+  const header = group.querySelector('[data-person-show-gallery-toggle]'); header.focus();
+  resolve({ isComplete: true, matchedPhotos: photoKeys(19).map(image_key => ({ image_key })) });
+  assert.equal(await second, true);
+  assert.equal(f.ctx.document.activeElement, header);
+  assert.equal(group.querySelector('[data-person-show-gallery-panel]').hidden, true);
+});
+test('More state round-trips through Person snapshots while fresh entry resets to four', async () => {
+  const f = legacyFixture(), group = prepareMore(f, [f.show('A', photoKeys(19))]);
+  await f.ctx.showMoreMusicPersonLegacyPhotos(group);
+  Object.assign(f.ctx, { personDetail: f.root, musicShowsSetsRequest: null, musicShowsSetsDataState: 'live',
+    musicPeopleIndexDataState: 'live', musicBandsIndex: { dataset: { bandsDataState: 'live' } },
+    musicPersonDetailArchiveRequests: new Map(), normalizeMusicPersonId: String, v3Text: value => value || '',
+    getComputedStyle: () => ({ visibility: 'visible' }) });
+  load(f.ctx, 'captureMusicResumeState'); load(f.ctx, 'restoreMusicResumeState');
+  const ui = f.ctx.captureMusicResumeState({ name: 'person-detail' });
+  assert.equal(ui.more[0], 'S1');
+  f.ctx.v3RouteContext = { entry: 'fresh' }; f.ctx.renderMusicPersonLegacyPreview(group);
+  assert.equal(visibleLegacyThumbs(group).length, 4);
+  f.ctx.v3RouteContext = { entry: 'fixture' };
+  assert.equal(f.ctx.restoreMusicResumeState({ name: 'person-detail', personId: '1' }, ui), true);
+  assert.equal(visibleLegacyThumbs(group).length, 19);
+});
+test('added thumbnail lazy loading is assigned before its src rather than after construction', () => {
+  const f = legacyFixture(); let loadingAtSrc;
+  const create = f.ctx.document.createElement;
+  f.ctx.document.createElement = tag => {
+    const item = create(tag);
+    if (tag === 'img') Object.defineProperty(item, 'src', { set() { loadingAtSrc = item.loading; } });
+    return item;
+  };
+  Object.assign(f.ctx, { getMusicPersonTaggedPhotoIdentity: photo => photo.image_key,
+    applyMusicGalleryImageLoading: image => { image.loading = 'eager'; }, createMusicPeopleSlug: String });
+  load(f.ctx, 'createMusicPersonTaggedThumb');
+  const photo = { image_key: 'one' };
+  f.ctx.createMusicPersonTaggedThumb(photo, { lightboxPhotos: [photo], personId: '1', show: { showId: 'S1', albumId: 'A' }, lazy: true });
+  assert.equal(loadingAtSrc, 'lazy');
+  f.ctx.createMusicPersonTaggedThumb(photo, { lightboxPhotos: [photo], personId: '1', show: { showId: 'S1', albumId: 'A' } });
+  assert.equal(loadingAtSrc, 'eager');
+});
+
+test('same-entry Back before old completion resets visual busy state and an old completion cannot clear newer work', async () => {
+  const f = legacyFixture(), group = prepareMore(f, [{ ...f.show('A', photoKeys(4)), expectedPhotoCount: 19, photosComplete: false }]);
+  const resolves = [];
+  f.ctx.requestMusicPersonTaggedShowMatchedPhotos = () => new Promise(resolve => resolves.push(resolve));
+  const first = f.ctx.showMoreMusicPersonLegacyPhotos(group);
+  f.ctx.v3RouteContext = { entry: 'away' };
+  f.ctx.v3RouteContext = { entry: 'fixture' };
+  f.ctx.renderMusicPersonLegacyPreview(group);
+  const more = group.querySelector('[data-person-show-more]');
+  assert.equal(group._personGalleryState.request, null); assert.equal(more.getAttribute('aria-busy'), 'false');
+  more.focus(); const second = f.ctx.showMoreMusicPersonLegacyPhotos(group);
+  assert.notEqual(first, second);
+  resolves[0]({ isComplete: true, matchedPhotos: photoKeys(19).map(image_key => ({ image_key })) });
+  assert.equal(await first, false);
+  assert.equal(group._personGalleryState.request, second);
+  assert.equal(visibleLegacyThumbs(group).length, 4);
+  resolves[1]({ isComplete: true, matchedPhotos: photoKeys(19).map(image_key => ({ image_key })) });
+  assert.equal(await second, true); assert.equal(visibleLegacyThumbs(group).length, 19);
 });
