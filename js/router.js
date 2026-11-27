@@ -273,7 +273,7 @@ function isCurrentV3Route(route) {
 }
 // Restoration eligibility is deliberately separate from presentation ownership.
 function isScopedRouteResume(route) {
-  return ['music-venues','music-venue-detail','music-venue-events','person-detail','show-detail','sets-archive',
+  return ['music-people','music-venues','music-venue-detail','music-venue-events','person-detail','show-detail','sets-archive',
     'wrestling-show-detail','wrestling-person-detail','wrestling-venue-detail'].includes(route?.name);
 }
 function isV3ResumeRoute(route) { return isCurrentV3Route(route) || isScopedRouteResume(route); }
@@ -294,6 +294,8 @@ function v3ResumeUI() { return v3RouteContext.pending ? v3RouteContext.snapshot?
 function getV3ResumeScrollers(route = v3RouteContext.route) {
   const selectors = route.name === 'music-bands' ? ['.rhythm-pillar','[data-rhythm-rolodex]','#rhythm-search-panel','[data-bands-search-results]']
     : route.name === 'band-detail' ? ['[data-band-detail-content]']
+    : route.name === 'music-people' ? ['[data-music-people-list]']
+    : route.name === 'person-detail' ? ['[data-person-detail]']
     : route.name === 'music-venues' ? ['[data-music-venues-list]']
     : route.name === 'wrestling-people-prototype' ? ['[data-wrestling-people-prototype-shell]',...['search','az','category','team'].map(mode=>'[data-hall-of-champions-workspace-results="'+mode+'"]')]
     : route.name === 'wrestling-person-detail' ? ['[data-wrestling-person-dossier-prototype-shell]','.wrestling-person-dossier-prototype-framework','[data-wrestling-person-dossier-prototype-event-archive-photo-grid]','.wrestling-person-dossier-prototype-event-history__card']

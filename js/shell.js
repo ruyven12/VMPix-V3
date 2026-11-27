@@ -2687,7 +2687,7 @@ function getBandDetailEngineTitle(bandId) {
 }
 
 function setPortfolioEngineHudCurrentView(viewName, options = {}) {
-  if (typeof getRouteFromUrl === "function" && getRouteFromUrl().name === "music-people") viewName = "Pillar of Melody";
+  if (typeof getRouteFromUrl === "function" && ["music-people", "person-detail"].includes(getRouteFromUrl().name)) viewName = getRouteFromUrl().name === "person-detail" ? "The Note" : "Pillar of Melody";
   if (portfolioEngineCurrentView) {
     portfolioEngineCurrentView.textContent = viewName;
   }

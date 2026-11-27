@@ -4195,7 +4195,7 @@ html[data-v3-booting][data-v3-harmony-boot] .site-shell > .harmony-environment,
 }
 
 /* Harbor owns the first visible frame after the boot mask is lifted. */
-.site-shell:is([data-shell-route="music-venues"], [data-shell-route="music-venue-detail"], [data-shell-route="music-venue-events"], [data-shell-route="music-people"]) .home-frame {
+.site-shell:is([data-shell-route="music-venues"], [data-shell-route="music-venue-detail"], [data-shell-route="music-venue-events"], [data-shell-route="music-people"], [data-shell-route="person-detail"]) .home-frame {
   display: none;
 }
 
@@ -33209,7 +33209,7 @@ button.hall-crusades-archive-crystal:focus-visible {
   animation-name: none !important;
 }
 
-/* Transport arrival follows Daïion pacing; revealing the prepared surface does not restart its clock. */
+/* Transport arrival follows Daï¿½ion pacing; revealing the prepared surface does not restart its clock. */
 .site-shell:is([data-music-transport-entry="arriving"],[data-music-transport-entry="resolving"]) .zhento-identity {
   opacity: 1;
   animation: zhentoTransportIdentityProject 720ms cubic-bezier(.2,.74,.24,1) 3200ms both !important;
@@ -35710,4 +35710,82 @@ html[data-v3-booting] .music-people-loading :is(.music-people-loading-motif, .mu
 @media (prefers-reduced-motion: reduce) {
   .music-people-index .music-people-staff .music-people-note svg { opacity: 1; }
   .music-people-index .music-people-staff [data-echo-note-shimmer] { display: none; }
+}
+
+/* M6.2 â€” The Note shares Melody's environment; content keeps one local scrollport. */
+.site-shell[data-shell-route="person-detail"]::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(rgba(5, 5, 7, .28), rgba(5, 5, 7, .28)), #100b17 url("/assets/media/background/zhento-melody.png") center / cover no-repeat;
+}
+.site-shell[data-shell-route="person-detail"] .portfolio-hub:has(> .music-nexus-shell) {
+  align-self: start; width: 100%; height: calc(100% - max(0px, 20px - 1rem)); min-height: 0;
+  padding: 0; border: 0; border-radius: 0; background: none;
+}
+.site-shell[data-shell-route="person-detail"] .music-nexus-shell {
+  grid-auto-rows: minmax(0, 1fr); align-content: stretch; gap: 0; padding: 0;
+  border: 0; border-radius: 0; background: none; overflow: clip; scrollbar-gutter: auto;
+}
+.site-shell[data-shell-route="person-detail"] .portfolio-hub::before,
+.site-shell[data-shell-route="person-detail"] .music-nexus-shell::before { content: none; }
+.site-shell[data-shell-route="person-detail"] .person-detail-screen {
+  min-height: 0; height: 100%; max-height: 100%; overflow: auto; overflow-anchor: none;
+  overscroll-behavior-y: contain; padding: .5rem clamp(.5rem, 2vw, 1.5rem) 1rem;
+  gap: clamp(1.5rem, 4vw, 3rem); scrollbar-color: rgba(225,197,150,.5) transparent;
+}
+.person-detail-screen :is([data-person-note], [data-person-resonance], [data-person-legacy]) {
+  width: min(100%, 64rem); justify-self: center; min-width: 0; position: relative;
+}
+.person-detail-screen .person-detail-hero {
+  display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: .85rem;
+  padding: 1rem 0; border: 0; background: none; border-radius: 0; overflow: visible; text-align: center;
+}
+.person-detail-screen :is(.person-detail-hero, .person-tagged-shows)::before { content: none; }
+.person-detail-screen .person-detail-kicker { font-size: .88rem; color: #e1c596; letter-spacing: .13em; }
+.person-detail-screen [data-person-signature] {
+  display: block; inline-size: clamp(7rem, 24vw, 9rem); block-size: clamp(7rem, 24vw, 9rem);
+  color: var(--melody-signature-color, #e1c596); flex: none; position: relative; z-index: 2;
+}
+.person-detail-screen [data-person-signature] svg { display: block; width: 100%; height: 100%; opacity: 1; }
+.person-detail-screen [data-person-signature][data-signature-id] {
+  animation: music-people-signature-breathe var(--melody-signature-duration, 8s) ease-in-out var(--melody-signature-delay, 0s) infinite paused;
+}
+.person-detail-screen [data-person-signature][data-signature-visible] { animation-play-state: running; }
+.person-detail-screen .person-detail-copy { justify-items: center; width: 100%; gap: .7rem; }
+.person-detail-screen .person-detail-name { font-size: clamp(1.8rem, 6vw, 3.6rem); line-height: 1.12; color: #f3e9f5; }
+.person-detail-screen .person-detail-pill-list { justify-content: center; }
+.person-detail-screen :is(.person-detail-pill, .person-detail-band-name-pill) { background: rgba(16,10,24,.6); border-color: rgba(225,197,150,.2); color: #e1c596; }
+.person-detail-screen .person-detail-aliases { margin: 0; color: #d4bedc; line-height: 1.5; }
+.person-detail-screen .person-detail-archive-data {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: .8rem 1.5rem; border: 0; background: none; padding: .75rem;
+}
+.person-detail-screen .person-detail-archive-row { display: grid; justify-items: center; gap: .3rem; }
+.person-detail-screen :is(.person-detail-archive-label, .person-detail-archive-value) { font-size: .86rem; line-height: 1.4; }
+.person-detail-screen .person-detail-archive-label { color: #cbb9d4; }
+.person-detail-screen .person-detail-archive-value { color: #f0e3f1; }
+.person-detail-screen :is([data-person-resonance], [data-person-legacy]) { display: grid; gap: 1rem; padding: 0; border: 0; background: none; overflow: visible; }
+.person-detail-screen :is(h4, h5) { margin: 0; text-align: center; color: #e1c596; font-weight: 400; font-size: 1.2rem; }
+.person-detail-screen [data-person-connection] { border-block-start: 1px solid rgba(225,197,150,.18); }
+.person-detail-screen [data-person-connection] summary { min-height: 44px; padding: .7rem; cursor: pointer; color: #e9d5ef; font-size: 1rem; }
+.person-detail-screen .person-connection-list { display: grid; gap: .8rem; padding: .5rem .5rem 1rem; }
+.person-detail-screen .person-connection-list > :is(a, span) { justify-self: center; }
+.person-detail-screen :is(a, button) { min-height: 44px; }
+.person-detail-screen a { color: #e1c596; padding: .5rem; overflow-wrap: anywhere; }
+.person-detail-screen :is(a, button, summary):focus-visible { outline: 2px solid #e3b7f0; outline-offset: 2px; }
+.person-detail-screen .person-detail-band-card { background: rgba(9,6,15,.65); border-color: rgba(225,197,150,.15); justify-items: center; }
+.person-detail-screen .person-legacy-show { display: grid; gap: .75rem; }
+.person-detail-screen .person-show-card { border-color: rgba(225,197,150,.2); background: rgba(9,6,15,.74); }
+.person-detail-screen .person-show-date { background: rgba(225,197,150,.06); color: #e1c596; }
+.person-detail-screen .person-show-detail-link { justify-self: end; font-size: .86rem; }
+.person-detail-screen .person-show-detail-link[hidden] { display: none; }
+.person-detail-screen :is(.person-detail-back, .person-show-view, [data-person-gallery-status] button, [data-person-detail-retry]) {
+  background: rgba(9,6,15,.82); color: #e1c596; border: 1px solid rgba(225,197,150,.24); border-radius: .45rem; padding: .5rem .85rem;
+}
+.person-detail-screen .person-detail-back { justify-self: start; }
+.person-detail-screen [data-person-gallery-status] { padding: .75rem; color: #e9d5ef; line-height: 1.5; }
+.person-detail-screen .person-detail-state { background: rgba(9,6,15,.72); text-transform: none; }
+@media (min-width: 64rem) {
+  .person-detail-screen .person-connection-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .person-detail-screen [data-person-signature][data-signature-id] { animation: none; }
 }

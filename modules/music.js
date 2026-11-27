@@ -350,6 +350,10 @@ let musicPeopleIndexRequestGeneration = 0;
 let musicPeopleIndexRetryAllowed;
 let musicPeopleIndexRecoveryState = null;
 const musicPersonDetailArchiveRequests = new Map();
+const musicPersonDetailArchiveStates = new Map();
+let musicPersonIdentityMotion = null;
+let musicPersonSelection = null;
+const musicPersonFocusOwners = new WeakSet();
 const musicPersonDetailArchiveRows = new Map();
 const musicPersonTaggedShowHydrationCache = new Map();
 const musicPersonTaggedShowHydrationRequests = new Map();
@@ -737,25 +741,21 @@ function getMusicPersonRouteUrl(personId) {
   return `${routePaths.musicPeople}/${encodeURIComponent(normalizedPersonId)}`;
 }
 
+function isMusicPersonRouteAmbiguous(personId) {
+  const id = normalizeMusicPersonId(personId);
+  const exact = getMusicPeopleIndexCollection().filter(row => normalizeMusicPersonId(row.backend_record?.person_id ?? row.person_id) === id);
+  if (exact.length) return exact.length !== 1;
+  return new Set(getMusicPeopleIndexCollection().filter(row => getMusicPersonArchiveCacheKeys(row).includes(id))
+    .map(row => normalizeMusicPersonId(row.backend_record?.person_id ?? row.person_id)).filter(Boolean)).size > 1;
+}
+
 function findMusicPersonById(personId) {
-  const normalizedPersonId = normalizeMusicPersonId(personId);
-  const peopleSources = [
-    ...getMusicPeopleIndexCollection(),
-    ...(Array.isArray(musicPeopleRows) ? musicPeopleRows : []),
-  ];
-  return peopleSources.find((person) => {
-    const source = person?.backend_record && typeof person.backend_record === "object"
-      ? { ...person.backend_record, ...person }
-      : person;
-    return [
-      source?.personId,
-      source?.id,
-      source?.slug,
-      source?.person_id,
-      getMusicPeopleRouteId(source),
-      createMusicPeopleSlug(source?.name),
-    ].some((candidate) => normalizeMusicPersonId(candidate) === normalizedPersonId);
-  }) || null;
+  const id = normalizeMusicPersonId(personId);
+  const rows = getMusicPeopleIndexCollection();
+  const stable = rows.filter(row => normalizeMusicPersonId(row.backend_record?.person_id ?? row.person_id) === id);
+  if (stable.length === 1) return stable[0];
+  const matches = rows.filter(row => getMusicPersonArchiveCacheKeys(row).includes(id));
+  return matches.length === 1 ? matches[0] : null;
 }
 
 function createMusicPersonDetailStateData(stateName, personId) {
@@ -772,26 +772,19 @@ function createMusicPersonDetailStateData(stateName, personId) {
 }
 
 function getMusicPersonDetailData(personId) {
-  const normalizedPersonId = normalizeMusicPersonId(personId);
-  if (normalizedPersonId === "loading") {
-    return createMusicPersonDetailStateData("loading", normalizedPersonId);
-  }
-  if (!musicPeopleIndexLoaded && typeof fetch === "function") {
-    return createMusicPersonDetailStateData("loading", normalizedPersonId);
-  }
-
-  const sourcePerson = findMusicPersonById(normalizedPersonId);
-  const placeholderData = !sourcePerson && normalizedPersonId === musicPersonDetailPlaceholder.personId
-    ? musicPersonDetailPlaceholder
-    : null;
-  if (!sourcePerson && !placeholderData) {
-    const stateName = musicPeopleIndexDataState === "error" && !musicPeopleIndexLoaded
-      ? "error"
-      : "empty";
-    return createMusicPersonDetailStateData(stateName, normalizedPersonId);
-  }
-
-  return getMusicPersonDetailViewData({ ...placeholderData, ...sourcePerson }, normalizedPersonId);
+  const id = normalizeMusicPersonId(personId);
+  const indexed = findMusicPersonById(id);
+  const cached = getCachedMusicPersonDetailArchiveRow(id);
+  const source = indexed ? { ...cached, ...indexed,
+    backend_record: { ...(cached?.backend_record || cached), ...(indexed.backend_record || indexed) } } : cached;
+  if (source) return isPublicMusicPeopleIndexRow(normalizeMusicPeopleIndexRow(source))
+    ? getMusicPersonDetailViewData(source, id) : createMusicPersonDetailStateData("empty", id);
+  const state = musicPersonDetailArchiveStates.get(id);
+  if (state === "error" || (!musicPeopleIndexRequest && musicPeopleIndexDataState === "error" && state !== "loading"))
+    return createMusicPersonDetailStateData("error", id);
+  if (state === "loading" || (state === "preparing" && musicPeopleIndexDataState !== "error" && !musicPeopleIndexLoaded) || musicPeopleIndexRequest || ["idle", "loading"].includes(musicPeopleIndexDataState))
+    return createMusicPersonDetailStateData("loading", id);
+  return createMusicPersonDetailStateData("empty", id);
 }
 
 function findBandById(bandId) {
@@ -2654,16 +2647,12 @@ function getMusicPersonDetailSearchName(personId) {
 }
 
 function getMusicPersonDetailApiUrl(personId) {
-  const search = getMusicPersonDetailSearchName(personId);
-  if (!search) {
-    return null;
-  }
-  const apiUrl = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE, MUSIC_BANDS_INDEX_API_BASE_URL);
-  apiUrl.searchParams.set("search", search.toLowerCase());
-  apiUrl.searchParams.set("limit", String(MUSIC_PERSON_DETAIL_SEARCH_LIMIT));
-  apiUrl.searchParams.set("page", "1");
-  apiUrl.searchParams.set("archive", "cache");
-  return apiUrl;
+  const person = findMusicPersonById(personId);
+  const id = getMusicPeopleText(person?.backend_record?.person_id ?? person?.person_id ?? (/^[1-9][0-9]*$/.test(personId) ? personId : ""));
+  const url = new URL(MUSIC_PEOPLE_INDEX_API_ROUTE + (id ? "/" + encodeURIComponent(id) : ""), MUSIC_BANDS_INDEX_API_BASE_URL);
+  if (!id) { url.searchParams.set("search", getMusicPersonDetailSearchName(personId).toLowerCase()); url.searchParams.set("limit", String(MUSIC_PERSON_DETAIL_SEARCH_LIMIT)); url.searchParams.set("page", "1"); }
+  url.searchParams.set("archive", "cache");
+  return url;
 }
 
 function getMusicPeopleRetryPermission(readiness) {
@@ -2791,34 +2780,25 @@ function fetchMusicPeopleIndexPayloads(signal, retryRelationships = false, onRea
 }
 
 function getMusicPersonDetailPayloadRows(payload) {
-  const rows = getMusicPeoplePayloadRows(payload);
-  if (rows.length > 0) {
-    return rows;
-  }
-  return [payload?.person, payload?.item, payload?.data, payload]
-    .filter((row) => row && typeof row === "object" && !Array.isArray(row));
+  const direct = [payload?.person, payload?.item, payload?.data, payload]
+    .find(row => row && typeof row === "object" && !Array.isArray(row) && row.person_id != null && typeof row.name === "string");
+  return direct ? [direct] : getMusicPeoplePayloadRows(payload);
 }
 
 function isExactMusicPersonDetailPayloadRow(row, personId, searchName) {
-  const normalizedPersonId = normalizeMusicPersonId(personId);
-  const normalizedSearchName = getMusicPeopleText(searchName).toLowerCase();
-  const rowName = getMusicPeopleText(row?.name ?? row?.title);
-  const rowNameKey = rowName.toLowerCase();
-  const rowRouteKeys = [
-    row?.slug,
-    row?.personId,
-    row?.id,
-    getMusicPeopleRouteId(row),
-    createMusicPeopleSlug(rowName),
-  ].map(normalizeMusicPersonId).filter(Boolean);
-
-  return Boolean(rowNameKey && rowNameKey === normalizedSearchName)
-    || rowRouteKeys.includes(normalizedPersonId);
+  const target = normalizeMusicPersonId(personId), known = findMusicPersonById(target);
+  if (isMusicPersonRouteAmbiguous(target)) return false;
+  const expected = normalizeMusicPersonId(known?.backend_record?.person_id ?? known?.person_id ?? (/^[1-9][0-9]*$/.test(target) ? target : ""));
+  const actual = normalizeMusicPersonId(row?.person_id ?? row?.backend_record?.person_id);
+  if (expected) return actual === expected;
+  return [row?.slug, row?.personId, createMusicPeopleSlug(row?.name)]
+    .map(normalizeMusicPersonId).includes(target);
 }
 
 function getMusicPersonDetailPayloadRow(payload, personId, searchName) {
-  return getMusicPersonDetailPayloadRows(payload)
-    .find((row) => isExactMusicPersonDetailPayloadRow(row, personId, searchName)) || null;
+  if (payload?.ok === false || payload?.error) throw new Error("Person archive unavailable");
+  const rows = getMusicPersonDetailPayloadRows(payload).filter(row => isExactMusicPersonDetailPayloadRow(row, personId, searchName));
+  return rows.length === 1 ? rows[0] : null;
 }
 
 function normalizeLiveMusicPeople(payload) {
@@ -2871,107 +2851,46 @@ function getMusicPersonArchiveCacheKeys(person) {
 }
 
 function getCachedMusicPersonDetailArchiveRow(personId) {
-  const normalizedPersonId = normalizeMusicPersonId(personId);
-  if (!normalizedPersonId) {
-    return null;
-  }
-  if (musicPersonDetailArchiveRows.has(normalizedPersonId)) {
-    return musicPersonDetailArchiveRows.get(normalizedPersonId);
-  }
-
-  const sourcePerson = findMusicPersonById(normalizedPersonId);
-  const sourceKey = sourcePerson ? getMusicPersonArchiveCacheKeys(sourcePerson)
-    .find((key) => musicPersonDetailArchiveRows.has(key)) : "";
-  return sourceKey ? musicPersonDetailArchiveRows.get(sourceKey) : null;
+  const id = normalizeMusicPersonId(personId), indexed = findMusicPersonById(id);
+  if (isMusicPersonRouteAmbiguous(id)) return null;
+  const stable = normalizeMusicPersonId(indexed?.backend_record?.person_id ?? indexed?.person_id ?? (/^[1-9][0-9]*$/.test(id) ? id : ""));
+  if (stable) return musicPersonDetailArchiveRows.get(stable) || null;
+  const matches = [...musicPersonDetailArchiveRows.values()].filter(row => getMusicPersonArchiveCacheKeys(row).includes(id));
+  return matches.length === 1 ? matches[0] : null;
 }
 
 function mergeMusicPersonDetailArchiveRow(row) {
-  const normalizedRows = normalizeLiveMusicPeople({ data: [row] });
-  const normalizedRow = normalizedRows[0];
-  if (!normalizedRow) {
-    return null;
-  }
-  if (!isPublicMusicPeopleIndexRow(normalizeMusicPeopleIndexRow(normalizedRow))) {
-    return null;
-  }
-
-  const rowKeys = getMusicPersonArchiveCacheKeys(normalizedRow);
-  rowKeys.forEach((rowKey) => {
-    musicPersonDetailArchiveRows.set(rowKey, normalizedRow);
-  });
-  if (musicPeopleIndexLastGoodRows !== null || musicPeopleIndexRequest || musicPeopleIndexDataState === "loading") return normalizedRow;
-  const existingRows = getMusicPeopleIndexCollection();
-  const existingIndex = existingRows.findIndex((person) => {
-    const personKeys = getMusicPersonArchiveCacheKeys(person);
-    return personKeys.some((personKey) => rowKeys.includes(personKey));
-  });
-  const nextRows = existingRows.slice();
-  if (existingIndex >= 0) {
-    nextRows[existingIndex] = {
-      ...nextRows[existingIndex],
-      ...normalizedRow,
-      backend_record: {
-        ...(nextRows[existingIndex].backend_record || {}),
-        ...(normalizedRow.backend_record || normalizedRow),
-      },
-    };
-  } else {
-    nextRows.push(normalizedRow);
-  }
-  setMusicPeopleIndexCollection(nextRows, musicPeopleIndexDataState);
+  const normalizedRow = normalizeLiveMusicPeople({ data: [row] })[0];
+  if (!normalizedRow || !isPublicMusicPeopleIndexRow(normalizeMusicPeopleIndexRow(normalizedRow))) return null;
+  const id = normalizeMusicPersonId(normalizedRow.backend_record?.person_id ?? normalizedRow.person_id);
+  if (!id) return null;
+  musicPersonDetailArchiveRows.set(id, normalizedRow);
   return normalizedRow;
 }
 
-function requestMusicPersonDetailArchive(personId) {
-  const normalizedPersonId = normalizeMusicPersonId(personId);
-  const apiUrl = getMusicPersonDetailApiUrl(normalizedPersonId);
-  if (!apiUrl || typeof fetch !== "function") {
-    return Promise.resolve(null);
-  }
-  const cachedRow = getCachedMusicPersonDetailArchiveRow(normalizedPersonId);
-  if (cachedRow) {
-    return Promise.resolve(cachedRow);
-  }
-  if (musicPersonDetailArchiveRequests.has(normalizedPersonId)) {
-    return musicPersonDetailArchiveRequests.get(normalizedPersonId);
-  }
-
-  const searchName = getMusicPersonDetailSearchName(normalizedPersonId);
+function requestMusicPersonDetailArchive(personId, options = {}) {
+  const id = normalizeMusicPersonId(personId), cached = getCachedMusicPersonDetailArchiveRow(id);
+  if (musicPersonDetailArchiveRequests.has(id)) return musicPersonDetailArchiveRequests.get(id);
+  if (cached && !options.force) return Promise.resolve(cached);
+  if (!id || typeof fetch !== "function") return Promise.resolve(null);
+  musicPersonDetailArchiveStates.set(id, "loading");
   const controller = typeof AbortController === "function" ? new AbortController() : null;
-  const timeoutId = controller
-    ? window.setTimeout(() => controller.abort(), MUSIC_PERSON_DETAIL_TIMEOUT_MS)
-    : 0;
-
-  const request = withMusicRequestTimeout(fetch(apiUrl, {
-    cache: "no-store",
-    signal: controller?.signal,
-  }), controller, MUSIC_PERSON_DETAIL_TIMEOUT_MS, "Music person detail")
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Music person detail request failed (${response.status})`);
+  const request = withMusicRequestTimeout(fetch(getMusicPersonDetailApiUrl(id), { cache: "no-store", signal: controller?.signal })
+    .then(response => { if (!response.ok) throw new Error("Person archive unavailable"); return response.json(); }),
+    controller, MUSIC_PERSON_DETAIL_TIMEOUT_MS, "Music person detail")
+    .then(payload => {
+      const rows = getMusicPersonDetailPayloadRows(payload);
+      const readiness = getMusicPeopleRelationshipReadiness({ ...payload, data: rows });
+      if (readiness && (readiness.status !== "ready" || !readiness.authoritative)) {
+        musicPersonDetailArchiveStates.set(id, readiness.status === "error" ? "error" : "preparing"); return null;
       }
-      return response.json();
-    })
-    .then((payload) => {
-      const row = getMusicPersonDetailPayloadRow(payload, normalizedPersonId, searchName);
-      return row ? mergeMusicPersonDetailArchiveRow(row) : null;
-    })
-    .catch((error) => {
-      console.warn(
-        `Music person archive search failed for ${normalizedPersonId}.`,
-        error && error.message ? error.message : error
-      );
-      return null;
-    })
-    .finally(() => {
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
-      }
-      musicPersonDetailArchiveRequests.delete(normalizedPersonId);
-    });
-
-  musicPersonDetailArchiveRequests.set(normalizedPersonId, request);
-  return request;
+      const row = getMusicPersonDetailPayloadRow(payload, id, getMusicPersonDetailSearchName(id));
+      const result = row ? mergeMusicPersonDetailArchiveRow(row) : null;
+      musicPersonDetailArchiveStates.set(id, result ? "ready" : "empty");
+      return result;
+    }).catch(() => { musicPersonDetailArchiveStates.set(id, "error"); return null; })
+    .finally(() => musicPersonDetailArchiveRequests.delete(id));
+  musicPersonDetailArchiveRequests.set(id, request); return request;
 }
 
 // One bounded recovery session per index request. Backend timestamps/heartbeats
@@ -7424,9 +7343,12 @@ function setMusicPersonDetailVisible(isVisible) {
     setSetGalleryVisible(false);
     setLightboxVisible(false);
   }
+  if (!isVisible) stopMusicPersonIdentityMotion();
   personDetail.setAttribute("aria-hidden", String(!isVisible));
   if (isVisible) {
     personDetail.removeAttribute("inert");
+    startMusicPersonIdentityMotion();
+    musicPersonSelection?.sourceAnimation?.cancel();
   } else {
     personDetail.setAttribute("inert", "");
   }
@@ -10526,10 +10448,12 @@ function returnToSetGalleryFromLightbox() {
     setLightboxVisible(false);
     activeGalleryPhoto = previousActiveGalleryPhoto;
     setMusicPersonDetailVisible(true);
-    setCurrentView("Person Detail");
+    setCurrentView("The Note");
+    const owner = v3RouteContext;
     window.requestAnimationFrame(() => {
-      if (musicNexusShell && scrollTop !== null) {
-        musicNexusShell.scrollTo({ top: scrollTop, behavior: "auto" });
+      if (v3RouteContext !== owner || getRouteFromUrl().name !== "person-detail") return;
+      if (personDetail && scrollTop !== null) {
+        personDetail.scrollTo({ top: scrollTop, behavior: "auto" });
       }
       if (focusTarget) {
         focusTarget.focus({ preventScroll: true });
@@ -13008,16 +12932,16 @@ function isMusicPersonDisplayInstrument(value) {
   return Boolean(normalizedValue) && !/^(performer|performers|friend|the fallen)$/.test(normalizedValue);
 }
 
-function findMusicBandByName(bandName) {
+function findMusicBandByName(bandName, liveOnly = false) {
   const normalizedBandName = createBandSlug(bandName);
   if (!normalizedBandName) {
     return null;
   }
-  const bandSources = [
+  const bandSources = liveOnly ? getMusicBandsIndexCollection() : [
     ...getMusicBandsIndexCollection(),
     ...(Array.isArray(musicBandIndexRows) ? musicBandIndexRows : []),
   ];
-  return bandSources.find((band) => {
+  const matches = bandSources.filter((band) => {
     const general = getBandDetailGeneral(band);
     return [
       getBandId(band),
@@ -13027,7 +12951,8 @@ function findMusicBandByName(bandName) {
       general.slug,
       getBandDetailName(band),
     ].some((candidate) => createBandSlug(candidate) === normalizedBandName);
-  }) || null;
+  });
+  return liveOnly ? (matches.length === 1 ? matches[0] : null) : matches[0] || null;
 }
 
 function getMusicPersonBandAssociationName(association) {
@@ -13093,7 +13018,7 @@ function getMusicPersonAssociatedBandItems(source, person) {
   ]);
 
   return associatedBandNames.map((bandName) => {
-    const band = findMusicBandByName(bandName);
+    const band = findMusicBandByName(bandName, true);
     const name = bandName;
     const bandInstruments = getMusicPersonBandSpecificInstruments(source, name);
     const instruments = bandInstruments.length > 0
@@ -13258,7 +13183,7 @@ function getMusicPersonTaggedShowVenue(show) {
   }
 
   const matchedShow = findMusicShowById(show?.show_id || show?.showId);
-  return getMusicShowVenueName(matchedShow) || "Venue Pending";
+  return getMusicShowVenueName(matchedShow) || "";
 }
 
 function getMusicPersonBandRouteSlug(band) {
@@ -13266,16 +13191,18 @@ function getMusicPersonBandRouteSlug(band) {
 }
 
 function getMusicPersonTaggedShowMatchedShow(show) {
-  return findMusicShowById(
-    show?.show_id ||
-    show?.showId ||
-    show?.show_key ||
-    show?.showKey ||
-    show?.setCode ||
-    show?.set_code ||
-    show?.date_folder ||
-    show?.dateFolder
-  );
+  if (musicShowsSetsDataState !== "live") return null;
+  const rows = getMusicShowsIndexRows();
+  const stable = getMusicPeopleText(show?.show_id || show?.showId);
+  if (stable) {
+    const exact = rows.filter(row => getMusicPeopleText(row.show_id ?? row.backend_record?.show_id ?? row.showId ?? row.id) === stable);
+    return exact.length === 1 ? exact[0] : null;
+  }
+  const key = getMusicPeopleText(show?.show_key || show?.showKey);
+  if (!key) return null;
+  const matches = rows.filter(row => [row.show_key, row.showKey, getMusicShowRouteCode(row)]
+    .some(value => getMusicPeopleText(value) === key));
+  return matches.length === 1 ? matches[0] : null;
 }
 
 function getMusicPersonTaggedShowBandSlug(show, associatedBands = [], matchedShow = null) {
@@ -13367,20 +13294,13 @@ function getMusicPersonTaggedShowSetCode(show, matchedShow = null, album = null)
 
 function getMusicPersonTaggedShowRoute(show, associatedBands = []) {
   const matchedShow = getMusicPersonTaggedShowMatchedShow(show);
-  const matchedAlbum = getMusicPersonTaggedShowAlbum(show, matchedShow, associatedBands);
-  if (matchedShow && matchedAlbum) {
-    const albumRoute = getMusicShowAlbumSetRoute(matchedShow, matchedAlbum);
-    if (albumRoute) {
-      return albumRoute;
-    }
-  }
-
-  const bandSlug = getMusicPersonTaggedShowBandSlug(show, associatedBands, matchedShow);
-  const setCode = getMusicPersonTaggedShowSetCode(show, matchedShow, matchedAlbum);
-  return bandSlug && setCode ? getSetRouteUrl(bandSlug, setCode) : "";
+  const albumId = getMusicPersonTaggedShowAlbumId(show);
+  if (!matchedShow || !albumId) return "";
+  const album = getMusicShowSmugAlbums(matchedShow).find(item => getMusicPersonTaggedShowAlbumKey(item) === albumId);
+  return album ? getMusicShowAlbumSetRoute(matchedShow, album) || "" : "";
 }
 
-function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = []) {
+function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = [], verified = false) {
   const title = getMusicPeopleText(show?.title || show?.show_title || show?.showTitle || show?.show_name || show?.showName || show?.name) || `Tagged Show ${index + 1}`;
   const matchedShow = getMusicPersonTaggedShowMatchedShow(show);
   const taggedPhotos = getMusicPeopleCountValue(show?.tagged_photo_count, show?.taggedPhotoCount, show?.photo_count, show?.photoCount);
@@ -13391,19 +13311,25 @@ function normalizeMusicPersonTaggedShowRow(show, index, associatedBands = []) {
   const hasRealThumbnails = photos.some((photo) => typeof photo === "object" && getMusicPersonMatchedPhotoUrl(photo));
   return {
     showId: getMusicPeopleText(show?.show_id || show?.showId || show?.album_id || show?.albumId) || createMusicPeopleSlug(`${title}-${index + 1}`),
+    documentedShowId: getMusicPeopleText(show?.show_id || show?.showId || show?.show_key || show?.showKey),
     showKey: getMusicPeopleText(show?.show_key || show?.showKey),
     albumId: getMusicPersonTaggedShowAlbumId(show),
     date: getMusicPersonShowDateParts(show),
     title,
     venue: getMusicPersonTaggedShowVenue(show),
-    location: getMusicPeopleText(show?.location) || "Location Pending",
+    location: getMusicPeopleText(show?.location),
     bandContext: getMusicPeopleText(show?.bandContext || show?.band_context),
     showRoute: getMusicPersonTaggedShowRoute(show, associatedBands),
+    detailRoute: matchedShow ? getMusicShowRouteUrl(matchedShow) : "",
+    venueId: getMusicPeopleText(matchedShow?.venue_id || matchedShow?.venueId),
+    photosComplete: verified && Number.isSafeInteger(show?.tagged_photo_count) && show.tagged_photo_count === photos.length
+      && new Set(photos.map(getMusicPersonTaggedPhotoIdentity)).size === photos.length,
     setCode: getMusicPersonTaggedShowSetCode(show, matchedShow),
-    taggedPhotosLabel: taggedPhotos > 0 ? formatMusicPeopleCount(taggedPhotos, "Tagged Photo") : formatMusicPeopleCount(photos.length, "Tagged Photo"),
+    taggedPhotosLabel: verified && Number.isSafeInteger(show?.tagged_photo_count) ? formatMusicPeopleCount(show.tagged_photo_count, "Tagged Photo") : formatMusicPeopleCount(photos.length, "Loaded Preview"),
+    expectedPhotoCount: verified && Number.isSafeInteger(show?.tagged_photo_count) ? show.tagged_photo_count : null,
     expanded: Boolean(show?.expanded) || (index === 0 && hasRealThumbnails),
-    contributors: "Contributors: Coming Soon",
-    notes: "",
+    contributors: getMusicPeopleText(show?.contributors),
+    notes: getMusicPeopleText(show?.notes),
     thumbnails: photos,
   };
 }
@@ -13428,11 +13354,13 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands = []
 
   const groups = new Map();
   photos.forEach((photo) => {
-    const groupKey = getMusicPeopleText(photo.show_id || photo.showId || photo.show_key || photo.showKey || photo.album_id || photo.albumId || photo.dateKey || "matched-photos");
+    const showId = getMusicPeopleText(photo.show_id || photo.showId || photo.show_key || photo.showKey);
+    const albumId = getMusicPersonTaggedShowAlbumId(photo);
+    const groupKey = JSON.stringify([showId, albumId]);
     if (!groups.has(groupKey)) {
       const title = getMusicPeopleText(photo.show_title || photo.showTitle || photo.show_name || photo.showName || photo.title) || "Tagged Archive Photos";
       groups.set(groupKey, {
-        showId: groupKey,
+        showId: showId || albumId || "matched-photos",
         showKey: getMusicPeopleText(photo.show_key || photo.showKey),
         albumId: getMusicPersonTaggedShowAlbumId(photo),
         rawDate: getMusicPeopleText(photo.show_date || photo.showDate || photo.date),
@@ -13440,11 +13368,11 @@ function getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands = []
         date: getMusicPersonShowDateParts({ date: photo.show_date || photo.showDate || photo.date }),
         title,
         venue: getMusicPersonTaggedShowVenue(photo),
-        location: getMusicPeopleText(photo.location) || "Location Pending",
+        location: getMusicPeopleText(photo.location),
         bandContext: getMusicPeopleText(photo.band_name || photo.bandName),
         taggedPhotosLabel: "",
         expanded: groups.size === 0,
-        contributors: "Contributors: Coming Soon",
+        contributors: "",
         notes: "",
         thumbnails: [],
       });
@@ -13611,42 +13539,45 @@ function getMusicPersonArchivePhotoCount(source) {
 
 function getMusicPersonDetailViewData(source, requestedPersonId) {
   const person = normalizeMusicPeopleIndexRow(source);
-  const name = getMusicPersonDisplayName(source?.name ?? person.name);
-  const summaryAppearances = getMusicPersonSummaryCount(source, /appearance/i);
-  const summaryPhotos = getMusicPersonSummaryCount(source, /photo/i);
-  const archiveAppearances = getMusicPersonArchiveAppearanceCount(source);
-  const archivePhotos = getMusicPersonArchivePhotoCount(source);
-  const appearances = archiveAppearances ?? summaryAppearances ?? person.appearances;
-  const photos = archivePhotos ?? summaryPhotos ?? person.photos;
-  const instrumentPills = getMusicPersonInstrumentPills(source, person);
+  const raw = { ...(source.backend_record || {}), ...source };
+  const verified = raw.photo_count_status === "verified" && Number.isSafeInteger(raw.verified_photo_count) && raw.verified_photo_count >= 0;
   const associatedBands = getMusicPersonAssociatedBandItems(source, person);
-  const taggedShowRows = getMusicPersonTaggedShowRows(source);
-  const matchedPhotoShows = getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands);
-  const taggedShows = taggedShowRows.length > 0
-    ? taggedShowRows
-      .map((show, index) => normalizeMusicPersonTaggedShowRow(show, index, associatedBands))
-      .map((show) => mergeMusicPersonTaggedShowWithMatchedPhotos(show, matchedPhotoShows))
-    : matchedPhotoShows.length > 0
-      ? matchedPhotoShows
-    : getMusicPersonTaggedShowsForBands(associatedBands);
-
-  return {
-    ...source,
-    state: "ready",
-    personId: normalizeMusicPersonId(person.personId || requestedPersonId),
-    imageLabel: getMusicPeopleText(source?.imageLabel ?? source?.thumb) || getBandInitials(name),
-    name,
-    categoryPill: person.categoryDisplay,
-    instrumentPills,
-    archiveRows: [
-      { label: "Appearances", value: Number.isFinite(appearances) ? formatMusicPeopleNumber(appearances) : "Pending" },
-      { label: "Photos", value: Number.isFinite(photos) ? formatMusicPeopleNumber(photos) : "Pending" },
-      { label: "First Seen", value: getMusicPersonSeenValue(source, "first") },
-      { label: "Latest Seen", value: getMusicPersonSeenValue(source, "latest") },
-    ],
-    associatedBands,
-    taggedShows,
-  };
+  const hasPhotoRelationships = !verified || raw.verified_photo_count > 0;
+  const taggedShowRows = hasPhotoRelationships ? getMusicPersonTaggedShowRows(source) : [];
+  const taggedShows = taggedShowRows.flatMap(show => {
+    const photos = getMusicPersonTaggedShowPhotos(show).filter(photo => photo && typeof photo === "object");
+    const albums = [...new Set(photos.map(getMusicPersonTaggedShowAlbumId).filter(Boolean))];
+    if (albums.length < 2) return [normalizeMusicPersonTaggedShowRow(show, 0, associatedBands, verified)];
+    const complete = verified && show.tagged_photo_count === photos.length;
+    return albums.map(album => {
+      const albumPhotos = photos.filter(photo => getMusicPersonTaggedShowAlbumId(photo) === album);
+      return normalizeMusicPersonTaggedShowRow({ ...show, album_id: album, matched_photos: albumPhotos,
+        tagged_photo_count: complete ? albumPhotos.length : null }, 0, associatedBands, complete);
+    });
+  });
+  if (hasPhotoRelationships && !taggedShowRows.length) taggedShows.push(...getMusicPersonTaggedShowsFromMatchedPhotos(source, associatedBands).map(show => ({
+    ...show, photosComplete: false, expectedPhotoCount: null,
+    documentedShowId: getMusicPeopleText(show.thumbnails.find(photo => photo.show_id || photo.show_key)?.show_id || show.thumbnails.find(photo => photo.show_key)?.show_key),
+    taggedPhotosLabel: formatMusicPeopleCount(show.thumbnails.length, "Loaded Preview"),
+    detailRoute: getMusicPersonTaggedShowMatchedShow(show) ? getMusicShowRouteUrl(getMusicPersonTaggedShowMatchedShow(show)) : ""
+  })));
+  const rows = [];
+  if (verified) {
+    rows.push({ label: "Verified photographs", value: formatMusicPeopleNumber(raw.verified_photo_count) });
+    for (const [label, key] of [["Documented shows", "show_count"], ["Archived sets", "set_count"]]) {
+      const count = raw[key] ?? raw.stats?.[key];
+      if (Number.isSafeInteger(count) && count >= 0) rows.push({ label, value: formatMusicPeopleNumber(count) });
+    }
+    for (const [label, type] of [["First photographed", "first"], ["Latest photographed", "latest"]]) {
+      const value = getMusicPersonSeenValue(source, type);
+      if (value && value !== "Pending") rows.push({ label, value });
+    }
+  }
+  return { ...source, state: "ready", personId: normalizeMusicPersonId(requestedPersonId || person.personId),
+    name: getMusicPersonDisplayName(source.name ?? person.name), instrumentNames: person.instrumentNames,
+    categoryPill: getMusicPeopleText(raw.category), instrumentPills: getMusicPersonInstrumentPills(source, person),
+    aliases: uniqueMusicPeopleValues(collectMusicPeopleTextValues(raw.aliases, ["name", "alias", "value"])),
+    archiveRows: rows, associatedBands, taggedShows, verified };
 }
 
 function createMusicPersonPill(text) {
@@ -13843,53 +13774,52 @@ function createMusicPersonTaggedLightboxTile(photo, index = 0, show = {}) {
   return tile;
 }
 
-function openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, photoIndex, trigger, options = {}) {
+async function openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, photoIndex, trigger, options = {}) {
   const show = options.show || {};
-  const context = getMusicPersonTaggedShowHydrationContext({
-    ...show,
-    personId: options.personId || show.personId,
-    personName: options.personName,
-  });
-  const currentPhotos = getMusicPersonTaggedLightboxPhotos(lightboxPhotos);
-  if (!context.albumId || !context.personName || !context.personId || currentPhotos.length === 0) {
-    openMusicPersonTaggedPhotoLightbox(currentPhotos, photoIndex, trigger, show, options.analytics);
-    return;
-  }
-
-  const cachedPhotos = getMusicPersonTaggedShowCachedLightboxPhotos(context);
-  const immediatePhotos = cachedPhotos.length > 0 ? cachedPhotos : currentPhotos;
-  const immediateIndex = getMusicPersonTaggedLightboxIndexForPhoto(immediatePhotos, item, photoIndex);
-  openMusicPersonTaggedPhotoLightbox(immediatePhotos, immediateIndex, trigger, show, options.analytics);
-
-  const cached = getMusicPersonTaggedShowHydrationCacheEntry(context);
-  if (Array.isArray(cached?.allPhotos) && cached.allPhotos.length > 0) {
-    return;
-  }
-
-  const token = musicPersonTaggedShowHydrationToken;
-  trigger.setAttribute("aria-busy", "true");
-  requestMusicPersonTaggedShowMatchedPhotos(context, {
-    mode: "all",
-    priority: true,
-    token,
-  })
-    .then((result) => {
-      if (
-        isMusicPersonTaggedShowHydrationCurrent(context.personId, token) &&
-        !isLightboxVisible()
-      ) {
-        const card = getMusicPersonShowCardById(context.showId);
-        if (card) {
-          applyMusicPersonShowCardHydrationResult(card, result, { token });
+  const context = getMusicPersonTaggedShowHydrationContext({ ...show,
+    personId: options.personId || show.personId, personName: options.personName });
+  const token = musicPersonTaggedShowHydrationToken, owner = v3RouteContext;
+  let photos = getMusicPersonTaggedLightboxPhotos(lightboxPhotos);
+  const agrees = photos => !Number.isSafeInteger(show.expectedPhotoCount) || photos.length === show.expectedPhotoCount;
+  if (!show.photosComplete || !agrees(photos)) {
+    const cached = getMusicPersonTaggedShowHydrationCacheEntry(context);
+    if (cached?.isComplete && Array.isArray(cached.allPhotos) && agrees(cached.allPhotos)) photos = getMusicPersonTaggedLightboxPhotos(cached.allPhotos);
+    else {
+      if (cached?.isComplete) musicPersonTaggedShowHydrationCache.delete(getMusicPersonTaggedShowHydrationKey(context));
+      if (!context.albumId || !context.personName || trigger.getAttribute("aria-busy") === "true") return;
+      trigger.setAttribute("aria-busy", "true");
+      const card = trigger.closest(".person-show-card");
+      let status = card?.querySelector("[data-person-gallery-status]");
+      if (!status && card) {
+        status = document.createElement("div"); status.dataset.personGalleryStatus = "";
+        status.setAttribute("role", "status"); card.append(status);
+      }
+      if (status) status.textContent = "Preparing the complete photo gallery…";
+      try {
+        const result = await requestMusicPersonTaggedShowMatchedPhotos(context, { mode: "all", priority: true, token });
+        if (owner !== v3RouteContext || !isMusicPersonTaggedShowHydrationCurrent(context.personId, token) || !trigger.isConnected) return;
+        if (!result?.isComplete || result.partialError || !agrees(result.matchedPhotos || [])) {
+          musicPersonTaggedShowHydrationCache.delete(getMusicPersonTaggedShowHydrationKey(context));
+          throw new Error("Incomplete gallery");
         }
-      }
-    })
-    .catch(() => {})
-    .finally(() => {
-      if (trigger?.isConnected) {
-        trigger.removeAttribute("aria-busy");
-      }
-    });
+        photos = getMusicPersonTaggedLightboxPhotos(result.matchedPhotos);
+        if (status) status.replaceChildren();
+        // Retain the activated source control until the shared lightbox returns.
+        if (card) card.dataset.personShowHydration = "complete";
+      } catch (_) {
+        if (owner !== v3RouteContext || !trigger.isConnected) return;
+        if (status) {
+          status.textContent = "The complete gallery is unavailable. ";
+          const retry = document.createElement("button"); retry.type = "button"; retry.textContent = "Retry gallery";
+          retry.addEventListener("click", () => openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, photoIndex, trigger, options));
+          status.append(retry);
+        }
+        return;
+      } finally { trigger.removeAttribute("aria-busy"); }
+    }
+  }
+  if (owner !== v3RouteContext || !trigger.isConnected || !isMusicPersonTaggedShowHydrationCurrent(context.personId, token)) return;
+  openMusicPersonTaggedPhotoLightbox(photos, getMusicPersonTaggedLightboxIndexForPhoto(photos, item, photoIndex), trigger, show, options.analytics);
 }
 
 function openMusicPersonTaggedPhotoLightbox(photos, photoIndex, trigger, show, analytics = null) {
@@ -13904,7 +13834,7 @@ function openMusicPersonTaggedPhotoLightbox(photos, photoIndex, trigger, show, a
     source: "person-detail",
     focusElement: trigger || null,
     previousActiveGalleryPhoto,
-    scrollTop: musicNexusShell ? musicNexusShell.scrollTop : 0,
+    scrollTop: personDetail ? personDetail.scrollTop : 0,
   };
   activeLightboxCustomTiles = lightboxPhotos.map((photo, index) => createMusicPersonTaggedLightboxTile(photo, index, show));
   const targetTile = activeLightboxCustomTiles[safeIndex] || activeLightboxCustomTiles[0] || null;
@@ -13917,6 +13847,7 @@ function createMusicPersonTaggedThumb(item, options = {}) {
   const canOpenLightbox = lightboxIndex >= 0;
   const thumb = document.createElement(canOpenLightbox ? "button" : "span");
   thumb.className = "person-show-tagged-thumb";
+  thumb.id = "person-photo-" + encodeURIComponent([options.personId, options.show?.showId, options.show?.albumId, getMusicPersonTaggedPhotoIdentity(item)].join("|"));
   if (canOpenLightbox) {
     thumb.type = "button";
     thumb.setAttribute(
@@ -13925,7 +13856,8 @@ function createMusicPersonTaggedThumb(item, options = {}) {
     );
     thumb.addEventListener("click", (event) => {
       event.stopPropagation();
-      openMusicPersonTaggedPhotoLightboxFromThumb(item, lightboxPhotos, lightboxIndex, thumb, { ...options, analytics: beginArchiveAnalytics(event) });
+      const current = thumb.closest(".person-show-card")?._personShowData || options.show;
+      openMusicPersonTaggedPhotoLightboxFromThumb(item, current?.photosComplete ? current.thumbnails : lightboxPhotos, lightboxIndex, thumb, { ...options, show: current, analytics: beginArchiveAnalytics(event) });
     });
   }
 
@@ -14132,7 +14064,7 @@ async function requestMusicPersonTaggedShowMatchedPhotos(context, options = {}) 
       reachedPreviewLimit: Boolean(cached.reachedPreviewLimit),
     };
   }
-  if (mode === "all" && Array.isArray(cached?.allPhotos)) {
+  if (mode === "all" && cached?.isComplete && Array.isArray(cached?.allPhotos)) {
     return {
       isComplete: Boolean(cached.isComplete),
       matchedPhotos: cached.allPhotos,
@@ -14268,7 +14200,7 @@ function applyMusicPersonShowCardHydrationResult(card, result, options = {}) {
 }
 
 function triggerMusicPersonShowCardHydration(card, options = {}) {
-  if (!card || card.dataset.personShowHydration === "complete") {
+  if (!card || ["complete", "ready"].includes(card.dataset.personShowHydration)) {
     return Promise.resolve(null);
   }
   const context = getMusicPersonTaggedShowHydrationContext(card);
@@ -14303,9 +14235,9 @@ function disconnectMusicPersonTaggedShowHydrationObserver() {
   }
 }
 
-function hydrateMusicPersonTaggedShowPhotos(data) {
+function hydrateMusicPersonTaggedShowPhotos(data, options = {}) {
   disconnectMusicPersonTaggedShowHydrationObserver();
-  musicPersonTaggedShowHydrationToken += 1;
+  if (!options.keepToken) musicPersonTaggedShowHydrationToken += 1;
 
   const token = musicPersonTaggedShowHydrationToken;
   const personId = normalizeMusicPersonId(data?.personId);
@@ -14360,6 +14292,7 @@ function createMusicPersonShowCard(show, personName) {
   const taggedThumbnails = Array.isArray(show.thumbnails) ? show.thumbnails : [];
   const albumId = getMusicPersonTaggedShowAlbumId(show);
   card.className = "person-show-card";
+  card._personShowData = show;
   card.classList.toggle("is-expanded", isExpanded);
   card.dataset.personId = getMusicPeopleText(show.personId) || activeMusicPersonDetailId || activeMusicPeopleId || "";
   card.dataset.personName = getMusicPeopleText(personName);
@@ -14372,7 +14305,7 @@ function createMusicPersonShowCard(show, personName) {
   card.dataset.personShowDateMonth = getMusicPeopleText(show.date?.month);
   card.dataset.personShowDateDay = getMusicPeopleText(show.date?.day);
   card.dataset.personShowDateYear = getMusicPeopleText(show.date?.year);
-  card.dataset.personShowHydration = taggedThumbnails.length > 0
+  card.dataset.personShowHydration = show.photosComplete ? "complete" : taggedThumbnails.length > 0
     ? "ready"
     : albumId
       ? "idle"
@@ -14380,6 +14313,7 @@ function createMusicPersonShowCard(show, personName) {
 
   const summary = document.createElement("button");
   summary.className = "person-show-summary";
+  summary.id = "person-show-" + encodeURIComponent(card.dataset.personShowId + "|" + albumId);
   summary.type = "button";
   summary.setAttribute("aria-expanded", String(isExpanded));
   const taggedPhotosLabel = getMusicPeopleText(show.taggedPhotosLabel) || formatMusicPeopleCount(show.taggedPhotos, "Tagged Photo");
@@ -14433,29 +14367,22 @@ function createMusicPersonShowCard(show, personName) {
   });
 
   const action = document.createElement("button");
-  action.className = "person-show-view";
-  action.type = "button";
-  action.textContent = "View Show";
-  const showRoute = getMusicPeopleText(show.showRoute);
-  if (showRoute) {
-    action.dataset.showRoute = showRoute;
-    action.addEventListener("click", (event) => {
-      event.stopPropagation();
-      const currentRoute = getRouteFromUrl();
-      const relationship = beginArchiveRelationshipAnalytics(event, "music", "person", "set", () => ({
-        source_content_id: musicPeopleIndexDataState === "live" ? findMusicPersonById(activeMusicPersonDetailId || activeMusicPeopleId)?.backend_record?.person_id : undefined,
-      }));
-      stageArchiveRelationshipAnalytics(relationship, showRoute);
-      navigateToRoute(showRoute, {
-        historyState: {
-          fromPersonDetail: true,
-          personDetailUrl: currentRoute.name === "person-detail" ? currentRoute.canonicalUrl : getMusicPersonRouteUrl(getMusicPeopleText(show.personId)),
-        },
-      });
-    });
-  } else {
-    action.disabled = true;
-  }
+  action.className = "person-show-view"; action.type = "button"; action.textContent = "View Set";
+  action.id = getMusicPersonControlId("set-link", card.dataset.personShowId + "|" + albumId);
+  action.dataset.showRoute = getMusicPeopleText(show.showRoute);
+  action.disabled = !action.dataset.showRoute;
+  action.addEventListener("click", event => {
+    event.stopPropagation();
+    const target = action.dataset.showRoute;
+    if (!target) return;
+    const currentRoute = getRouteFromUrl();
+    const relationship = beginArchiveRelationshipAnalytics(event, "music", "person", "set", () => ({
+      source_content_id: findMusicPersonById(activeMusicPersonDetailId || activeMusicPeopleId)?.backend_record?.person_id
+    }));
+    stageArchiveRelationshipAnalytics(relationship, target);
+    navigateToRoute(target, { historyState: { fromPersonDetail: true,
+      personDetailUrl: currentRoute.name === "person-detail" ? currentRoute.canonicalUrl : getMusicPersonRouteUrl(card.dataset.personId) } });
+  });
 
   const expanded = document.createElement("div");
   expanded.className = "person-show-expanded";
@@ -14482,7 +14409,8 @@ function createMusicPersonShowCard(show, personName) {
 
   const meta = document.createElement("p");
   meta.className = "person-show-expanded-meta";
-  meta.textContent = `Contributor: ${MUSIC_CONTRIBUTOR_DISPLAY_COUNT}`;
+  meta.textContent = getMusicPeopleText(show.contributors);
+  meta.hidden = !meta.textContent;
 
   const noteText = getMusicPeopleText(show.notes);
   const notes = noteText ? document.createElement("p") : null;
@@ -14495,182 +14423,328 @@ function createMusicPersonShowCard(show, personName) {
   if (notes) {
     expanded.append(notes);
   }
-  card.append(summary, action, expanded);
+  const showAction = document.createElement("a");
+  showAction.className = "person-show-detail-link"; showAction.textContent = "Show Detail";
+  showAction.id = getMusicPersonControlId("show-link", card.dataset.personShowId + "|" + albumId);
+  if (show.detailRoute) showAction.href = show.detailRoute; else showAction.hidden = true;
+  showAction.addEventListener("click", event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigateToRoute(showAction.getAttribute("href")); });
+  card.append(summary, showAction, action, expanded);
   return card;
 }
 
 function renderMusicPersonDetailState(data) {
-  if (!personDetail) {
-    return;
+  const back = document.createElement("button"); back.className = "person-detail-back"; back.type = "button";
+  back.textContent = "Back"; back.addEventListener("click", returnToMusicPeopleRoute);
+  const panel = document.createElement("section"); panel.className = "person-detail-state"; panel.dataset.personDetailState = data.state;
+  panel.setAttribute("role", "status");
+  const title = document.createElement("h3"); title.id = "person-detail-title";
+  title.textContent = data.state === "loading" ? "Tuning the Note" : data.title;
+  const copy = document.createElement("p"); copy.textContent = data.state === "loading" ? "Establishing resonance" : data.copy;
+  panel.append(title, copy);
+  if (data.state === "error") {
+    const retry = document.createElement("button"); retry.type = "button"; retry.textContent = "Retry"; retry.dataset.personDetailRetry = "";
+    retry.disabled = !!musicPeopleIndexRequest;
+    retry.addEventListener("click", () => {
+      if (musicPersonDetailArchiveRequests.has(data.personId) || musicPeopleIndexRequest) return;
+      if (musicPeopleIndexDataState === "error") {
+        if (musicPeopleIndexRetryAllowed === false) requestMusicPeopleIndexData();
+        else retryMusicPeopleIndexState();
+      }
+      showMusicPersonDetail(data.personId, { force: true });
+    });
+    panel.append(retry);
   }
+  personDetail.replaceChildren(back, panel);
+}
 
-  const backButton = document.createElement("button");
-  backButton.className = "person-detail-back";
-  backButton.type = "button";
-  backButton.textContent = "Back";
-  backButton.addEventListener("click", returnToMusicPeopleRoute);
+function getMusicPersonControlId(kind, target) {
+  const person = personDetail.querySelector("[data-person-signature]")?.dataset.signatureId || activeMusicPersonDetailId;
+  return "person-" + kind + "-" + encodeURIComponent(person + "|" + target);
+}
 
-  const statePanel = createMusicV3StateCard(data.state === "error" ? "error" : data.state, "musicPeople", {
-    title: data.title,
-    text: data.copy,
-    detail: data.name,
-  });
-  statePanel.classList.add("person-detail-state");
-  const title = statePanel.querySelector(".v3-state-title");
-  if (title) {
-    title.id = "person-detail-title";
+function createMusicPersonConnectionLink(label, url, key = label) {
+  const node = document.createElement(url ? "a" : "span"); node.textContent = label;
+  if (url) node.id = getMusicPersonControlId("connection", url + "|" + key);
+  if (url) { node.href = url; node.addEventListener("click", event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigateToRoute(url); }); }
+  return node;
+}
+
+function renderMusicPersonConnections(data) {
+  const section = document.createElement("section"); section.dataset.personResonance = "";
+  const title = document.createElement("h4"); title.textContent = "Resonance"; section.append(title);
+  const shows = [...new Map(data.taggedShows.filter(show => show.documentedShowId).map(show => [show.documentedShowId, show])).values()];
+  const venues = [...new Map(data.taggedShows.filter(show => show.venueId).map(show => [show.venueId, show])).values()];
+  const categories = [
+    ["bands", "Bands", data.associatedBands, band => {
+      const card = createMusicPersonAssociatedBand(band);
+      if (band.bandId) card.append(createMusicPersonConnectionLink("Band Detail", getBandRouteUrl(band.bandId), band.bandId + "|" + band.name));
+      return card;
+    }],
+    ["shows", "Shows", shows, show => createMusicPersonConnectionLink(show.title, show.detailRoute, show.documentedShowId)],
+    ["venues", "Venues", venues, show => createMusicPersonConnectionLink(show.venue,
+      getMusicVenueRouteUrl({ venue_id: show.venueId, venue_key: show.venueId }), show.venueId)]
+  ];
+  for (const [key, label, rows, render] of categories) {
+    const group = document.createElement("details"); group.dataset.personConnection = key;
+    const summary = document.createElement("summary");
+    summary.id = getMusicPersonControlId("connections", key);
+    const pendingFeed = ["idle", "loading", "error"].includes(key === "bands" ? musicBandsIndex.dataset.bandsDataState : musicShowsSetsDataState);
+    summary.textContent = label + (rows.length || !pendingFeed ? " · " + rows.length : " · " + ((key === "bands" ? musicBandsIndex.dataset.bandsDataState : musicShowsSetsDataState) === "error" ? "Unavailable" : "Loading"));
+    const list = document.createElement("div"); list.className = "person-connection-list";
+    rows.forEach(row => list.append(render(row)));
+    if (!rows.length && !["idle", "loading", "error"].includes(key === "bands" ? musicBandsIndex.dataset.bandsDataState : musicShowsSetsDataState)) { const empty = document.createElement("p"); empty.textContent = "No documented connections available."; list.append(empty); }
+    const feedState = key === "bands" ? musicBandsIndex.dataset.bandsDataState : musicShowsSetsDataState;
+    if (["idle", "loading", "error"].includes(feedState)) {
+      const status = document.createElement("p");
+      status.textContent = feedState === "error" ? "Connection details are unavailable." : "Checking documented connections…";
+      list.append(status);
+      if (feedState === "error") {
+        const retry = document.createElement("button"); retry.type = "button"; retry.textContent = "Retry connections";
+        retry.addEventListener("click", () => {
+          const owner = v3RouteContext;
+          if (key === "bands") musicBandsIndexLoaded = false;
+          else { musicShowsSetsLoaded = false; musicShowsIndexDataRequested = false; }
+          const request = key === "bands" ? requestMusicBandsIndexData() : requestMusicShowsSetsData();
+          request.then(() => { if (v3RouteContext === owner && getRouteFromUrl().name === "person-detail") renderMusicPersonDetail(getMusicPersonDetailData(activeMusicPersonDetailId)); });
+        });
+        list.append(retry);
+      }
+    }
+
+    group.append(summary, list); section.append(group);
   }
-  personDetail.replaceChildren(backButton, statePanel);
+  return section;
 }
 
 function renderMusicPersonDetail(data) {
-  if (!personDetail) {
-    return;
+  if (!personDetail) return;
+  if (data.state !== "ready") {
+    stopMusicPersonIdentityMotion(); delete personDetail.dataset.personIdentity;
+    renderMusicPersonDetailState(data); return;
   }
+  const same = personDetail.dataset.personIdentity === data.personId && personDetail.querySelector("[data-person-note]");
+  const open = [...personDetail.querySelectorAll("details[open]")].map(node => node.dataset.personConnection);
+  const expanded = new Set([...personDetail.querySelectorAll(".person-show-card.is-expanded")].map(card => card.dataset.personShowId + "|" + card.dataset.personShowAlbumId));
+  const top = personDetail.scrollTop, focused = document.activeElement, connection = focused?.closest("[data-person-connection]")?.dataset.personConnection;
   disconnectMusicPersonTaggedShowHydrationObserver();
-  musicPersonTaggedShowHydrationToken += 1;
-  if (data.state && data.state !== "ready") {
-    renderMusicPersonDetailState(data);
-    return;
-  }
+  if (!same) musicPersonTaggedShowHydrationToken++;
+  if (!same) {
+    stopMusicPersonIdentityMotion();
+    const back = document.createElement("button"); back.type = "button"; back.className = "person-detail-back"; back.textContent = "Back"; back.addEventListener("click", returnToMusicPeopleRoute);
+    const hero = document.createElement("section"); hero.className = "person-detail-hero"; hero.dataset.personNote = "";
+    const kicker = document.createElement("p"); kicker.className = "person-detail-kicker"; kicker.textContent = "The Note";
+    const signature = createMusicPeopleEchoNote(getMusicPeopleSignatureDescriptor(data));
+    signature.dataset.personSignature = ""; signature.querySelector("svg").style.setProperty("--echo-note-opacity", "1");
+    const copy = document.createElement("div"); copy.className = "person-detail-copy";
+    const name = document.createElement("h3"); name.id = "person-detail-title"; name.className = "person-detail-name"; name.tabIndex = -1; name.textContent = data.name;
+    copy.append(name, createMusicPersonPillList(data));
+    if (data.aliases?.length) { const aliases = document.createElement("p"); aliases.className = "person-detail-aliases"; aliases.textContent = data.aliases.join(" · "); copy.append(aliases); }
+    hero.append(kicker, signature, copy, createMusicPersonArchiveBlock(data.archiveRows));
+    personDetail.replaceChildren(back, hero); personDetail.dataset.personIdentity = data.personId;
 
-  const backButton = document.createElement("button");
-  backButton.className = "person-detail-back";
-  backButton.type = "button";
-  backButton.textContent = "Back";
-  backButton.addEventListener("click", returnToMusicPeopleRoute);
-
-  const hero = document.createElement("section");
-  hero.className = "person-detail-hero";
-  hero.setAttribute("aria-labelledby", "person-detail-title");
-
-  const image = document.createElement("div");
-  image.className = "person-detail-image";
-  image.setAttribute("role", "img");
-  image.setAttribute("aria-label", `${data.name} placeholder archive portrait`);
-
-  const imageMark = document.createElement("span");
-  imageMark.className = "person-detail-image-mark";
-  imageMark.setAttribute("aria-hidden", "true");
-  imageMark.textContent = data.imageLabel;
-  image.append(imageMark);
-
-  const copy = document.createElement("div");
-  copy.className = "person-detail-copy";
-
-  const name = document.createElement("h3");
-  name.className = "person-detail-name";
-  name.id = "person-detail-title";
-  name.textContent = data.name;
-
-  copy.append(
-    name,
-    createMusicPersonPillList(data),
-    createMusicPersonArchiveBlock(data.archiveRows)
-  );
-  hero.append(image, copy);
-
-  const associated = document.createElement("section");
-  associated.className = "person-detail-associated";
-  associated.setAttribute("aria-labelledby", "person-associated-title");
-
-  const associatedTitle = document.createElement("h4");
-  associatedTitle.className = "person-detail-section-title";
-  associatedTitle.id = "person-associated-title";
-  associatedTitle.textContent = "Associated Bands";
-
-  const associatedList = document.createElement("div");
-  associatedList.className = "person-detail-band-list";
-  const associatedBands = Array.isArray(data.associatedBands) ? data.associatedBands : [];
-  if (associatedBands.length > 0) {
-    associatedBands.forEach((band) => {
-      associatedList.append(createMusicPersonAssociatedBand(band));
-    });
   } else {
-    associatedList.append(createMusicPersonEmptyState("No associated bands indexed yet."));
+    const copy = personDetail.querySelector(".person-detail-copy");
+    const name = copy.querySelector("h3"); name.textContent = data.name;
+    copy.querySelector(".person-detail-pill-list")?.replaceWith(createMusicPersonPillList(data));
+    copy.querySelector(".person-detail-aliases")?.remove();
+    if (data.aliases?.length) { const aliases = document.createElement("p"); aliases.className = "person-detail-aliases"; aliases.textContent = data.aliases.join(" · "); copy.append(aliases); }
+    const archive = personDetail.querySelector(".person-detail-archive-data");
+    archive?.replaceChildren(...createMusicPersonArchiveBlock(data.archiveRows).childNodes);
   }
-  associated.append(associatedTitle, associatedList);
-
-  const taggedShows = document.createElement("section");
-  taggedShows.className = "person-tagged-shows";
-  taggedShows.setAttribute("aria-labelledby", "person-tagged-shows-title");
-
-  const taggedHeader = document.createElement("header");
-  taggedHeader.className = "person-tagged-shows-header";
-
-  const taggedTitle = document.createElement("h4");
-  taggedTitle.className = "person-detail-section-title";
-  taggedTitle.id = "person-tagged-shows-title";
-  taggedTitle.textContent = "Tagged Shows";
-
-  taggedHeader.append(taggedTitle);
-
-  const showList = document.createElement("div");
-  showList.className = "person-show-list";
-  const taggedShowRows = Array.isArray(data.taggedShows) ? data.taggedShows : [];
-  if (taggedShowRows.length > 0) {
-    taggedShowRows.forEach((show) => {
-      showList.append(createMusicPersonShowCard(show, data.name));
+  const resonance = renderMusicPersonConnections(data), legacy = document.createElement("section");
+  legacy.dataset.personLegacy = ""; legacy.className = "person-tagged-shows";
+  const title = document.createElement("h4"); title.textContent = "Legacy"; legacy.append(title);
+  const groups = new Map();
+  data.taggedShows.forEach(show => {
+    if (!groups.has(show.showId)) {
+      const group = document.createElement("section"), heading = document.createElement("h5");
+      group.className = "person-legacy-show"; heading.textContent = show.title; group.append(heading); groups.set(show.showId, group); legacy.append(group);
+    }
+    groups.get(show.showId).append(createMusicPersonShowCard(show, data.name));
+  });
+  if (!data.taggedShows.length) legacy.append(createMusicPersonEmptyState("No documented performances or photographs available."));
+  const oldLegacy = personDetail.querySelector("[data-person-legacy]");
+  let keepLegacy = false;
+  if (same && oldLegacy) {
+    const key = card => card.dataset.personShowId + "|" + card.dataset.personShowAlbumId;
+    const oldCards = new Map([...oldLegacy.querySelectorAll(".person-show-card")].map(card => [key(card), card]));
+    const newCards = [...legacy.querySelectorAll(".person-show-card")];
+    keepLegacy = newCards.length === oldCards.size && newCards.every(card => oldCards.has(key(card)));
+    if (keepLegacy) newCards.forEach(card => {
+      const retained = oldCards.get(key(card)); retained._personShowData = card._personShowData;
+      retained.querySelector(".person-show-count").textContent = card.querySelector(".person-show-count").textContent;
+      const action = retained.querySelector(".person-show-view"), fresh = card.querySelector(".person-show-view");
+      action.dataset.showRoute = fresh.dataset.showRoute || ""; action.disabled = fresh.disabled;
+      const link = retained.querySelector(".person-show-detail-link"), newLink = card.querySelector(".person-show-detail-link");
+      link.hidden = newLink.hidden; if (newLink.hasAttribute("href")) link.href = newLink.href;
     });
-  } else {
-    showList.append(createMusicPersonEmptyState("No tagged shows indexed for this person yet."));
   }
-
-  taggedShows.append(taggedHeader, showList);
-  personDetail.replaceChildren(backButton, hero, associated, taggedShows);
-  hydrateMusicPersonTaggedShowPhotos(data);
+  const oldResonance = personDetail.querySelector("[data-person-resonance]");
+  if (oldResonance) oldResonance.replaceChildren(...resonance.childNodes);
+  else personDetail.append(resonance);
+  if (!keepLegacy) {
+    if (oldLegacy) oldLegacy.replaceChildren(...legacy.childNodes);
+    else personDetail.append(legacy);
+  }
+  open.forEach(key => { const group = [...personDetail.querySelectorAll("[data-person-resonance] details")].find(node => node.dataset.personConnection === key); if (group) group.open = true; });
+  if (same) {
+    personDetail.scrollTop = top;
+    personDetail.querySelectorAll("[data-person-legacy] .person-show-card").forEach(card => {
+      if (card.classList.contains("is-expanded") !== expanded.has(card.dataset.personShowId + "|" + card.dataset.personShowAlbumId)) toggleMusicPersonShowCard(card);
+    });
+    if (connection && document.activeElement === document.body) [...personDetail.querySelectorAll("[data-person-resonance] details")]
+      .find(node => node.dataset.personConnection === connection)?.querySelector("summary").focus({ preventScroll: true });
+  }
+  hydrateMusicPersonTaggedShowPhotos(data, { keepToken: !!same }); startMusicPersonIdentityMotion();
 }
 
-function showMusicPersonDetail(personId) {
-  const context = v3RouteContext;
-  const data = getMusicPersonDetailData(personId);
-  activeMusicPersonDetailId = data.personId;
-  setActiveMusicPeopleRow(data.personId);
-  renderMusicPersonDetail(data);
-  setBandsIndexVisible(false);
-  setPeopleIndexVisible(false);
-  setMusicVenueIndexVisible(false);
-  setMusicActivityPanelVisible(false);
-  setMusicPersonDetailVisible(true);
-  setCurrentView("Person Detail");
-  if (musicNexusShell && !v3RouteContext.snapshot) {
-    musicNexusShell.scrollTo({
-      top: 0,
-      behavior: reducedMotion.matches ? "auto" : "smooth",
-    });
-  }
-  requestMusicPersonDetailArchive(personId).then((archiveRow) => {
-    if (!archiveRow) {
-      return;
-    }
+function showMusicPersonDetail(personId, options = {}) {
+  const context = v3RouteContext, request = requestMusicPersonDetailArchive(personId, options);
+  const refresh = () => {
     const route = getRouteFromUrl();
-    if (v3RouteContext !== context || route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) {
-      return;
-    }
-    const archiveData = getMusicPersonDetailData(personId);
-    activeMusicPersonDetailId = archiveData.personId;
-    setActiveMusicPeopleRow(archiveData.personId);
-    renderMusicPersonDetail(archiveData);
-  });
-
-  Promise.allSettled([
-    requestMusicPeopleIndexData(),
-    requestMusicBandsIndexData(),
-    requestMusicShowsSetsData(),
-  ]).then(() => {
-    const route = getRouteFromUrl();
-    if (v3RouteContext !== context || route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) {
-      return;
-    }
-    const refreshedData = getMusicPersonDetailData(personId);
-    activeMusicPersonDetailId = refreshedData.personId;
-    setActiveMusicPeopleRow(refreshedData.personId);
-    renderMusicPersonDetail(refreshedData);
-  });
+    if (v3RouteContext !== context || route.name !== "person-detail" || normalizeMusicPersonId(route.personId) !== normalizeMusicPersonId(personId)) return;
+    const data = getMusicPersonDetailData(personId);
+    activeMusicPersonDetailId = data.personId; setActiveMusicPeopleRow(data.personId); renderMusicPersonDetail(data);
+  };
+  refresh();
+  setBandsIndexVisible(false); setPeopleIndexVisible(false); setMusicVenueIndexVisible(false); setMusicActivityPanelVisible(false);
+  setMusicPersonDetailVisible(true); setCurrentView("The Note");
+  if (!context.snapshot) personDetail.scrollTop = 0;
+  request.then(refresh);
+  Promise.allSettled([requestMusicPeopleIndexData(), requestMusicBandsIndexData(), requestMusicShowsSetsData()]).then(refresh);
 }
 
 function returnToMusicPeopleRoute() {
   performShellBack();
+}
+
+// Local selection cue; the Shell remains the route/history owner.
+function enterMusicPersonNote(person, trigger) {
+  if (getRouteFromUrl().name !== "music-people" || musicPersonSelection?.pending) return;
+  trigger?.focus({ preventScroll: true });
+  const signature = trigger?.querySelector(".music-people-note");
+  const selection = { pending: true, context: v3RouteContext, id: getMusicPeopleSignatureDescriptor(person).id,
+    rect: signature?.getBoundingClientRect(), at: performance.now() };
+  musicPersonSelection = selection;
+  const go = () => {
+    if (musicPersonSelection !== selection || v3RouteContext !== selection.context || getRouteFromUrl().name !== "music-people") { selection.pending = false; selection.sourceAnimation?.cancel(); if (musicPersonSelection === selection) musicPersonSelection = null; return; }
+    selection.pending = false; setActiveMusicPeopleRow(person.personId);
+    const rows = getMusicPeopleIndexCollection().filter(row => getMusicPeopleRouteId(row) === getMusicPeopleRouteId(person));
+    const destination = rows.length > 1 && selection.id ? selection.id : person.personId;
+    navigateToRoute(getMusicPersonRouteUrl(destination), { historyState: { fromPeopleIndex: true } });
+  };
+  if (reducedMotion.matches || !signature?.animate) { go(); if (musicPersonSelection === selection) musicPersonSelection = null; return; }
+  const viewport = musicPeopleList.getBoundingClientRect();
+  const peers = [...musicPeopleList.querySelectorAll(".music-people-echo-transit, .music-people-row")].filter(node => {
+    if (node.contains(trigger)) return false;
+    const box = node.getBoundingClientRect();
+    return box.right > viewport.left && box.left < viewport.right && box.bottom > viewport.top && box.top < viewport.bottom;
+  });
+  const base = Number(getComputedStyle(signature).opacity) || 1;
+  const animations = [signature.animate([{ opacity: base }, { opacity: 1 }, { opacity: base }], { duration: 160, easing: "ease-in-out" }),
+    ...peers.map(node => node.animate([{ opacity: 1 }, { opacity: .18 }], { duration: 160, fill: "forwards", easing: "ease-in" }))];
+  selection.sourceAnimation = { cancel() { animations.forEach(animation => animation.cancel()); },
+    finished: Promise.all(animations.map(animation => animation.finished)) };
+  selection.sourceAnimation.finished.then(go, () => { selection.pending = false; if (musicPersonSelection === selection) musicPersonSelection = null; });
+}
+
+function stopMusicPersonIdentityMotion() {
+  musicPersonIdentityMotion?.dispose(); musicPersonIdentityMotion = null;
+}
+
+function advanceMusicPeopleSignatureShimmer(effect, elapsed, budget = Infinity) {
+  if (effect.wait === null) {
+    effect.wait = effect.firstSweep ? 1200 + effect.random() * 2400 : 5000 + effect.random() * 5000;
+    effect.duration = 900 + effect.random() * 200;
+  }
+  if (effect.sweep < 0) {
+    const availableWait = budget - effect.duration - 250;
+    if (availableWait < 0) return false;
+    if (effect.firstSweep) effect.wait = Math.min(effect.wait, availableWait);
+    effect.wait -= elapsed;
+    if (effect.wait > 0) return true;
+    effect.sweep = 0; effect.firstSweep = false;
+  }
+  effect.sweep += elapsed / effect.duration;
+  if (effect.sweep >= 1) {
+    effect.sweep = -1; effect.wait = 5000 + effect.random() * 5000;
+    effect.shimmer.setAttribute("opacity", "0"); return true;
+  }
+  effect.shimmer.setAttribute("opacity", ".58");
+  effect.band.setAttribute("transform", "translate(" + (-16 + effect.sweep * 96) + " 0)");
+  return true;
+}
+
+function startMusicPersonIdentityMotion() {
+  if (musicPersonIdentityMotion || !personDetail?.querySelector("[data-person-signature]")) return;
+  const note = personDetail.querySelector("[data-person-signature]"), effect = note._echoNoteEffect;
+  let frame = 0, last = 0, visible = false, disposed = false;
+  const flights = [];
+  const owns = () => !disposed && note.isConnected && getRouteFromUrl().name === "person-detail"
+    && !document.hidden && !document.documentElement.hasAttribute("data-v3-booting")
+    && getComputedStyle(personDetail).visibility !== "hidden"
+    && !note.parentElement?.closest('[hidden], [inert], [aria-hidden="true"]');
+  const focusOwner = () => {
+    const owner = v3RouteContext, active = document.activeElement;
+    if (!owns() || owner.pending || owner.snapshot || musicPersonFocusOwners.has(owner)) return;
+    if (active !== document.body && !active?.closest('[inert], [aria-hidden="true"]')) return;
+    const heading = personDetail.querySelector("#person-detail-title");
+    heading?.focus({ preventScroll: true });
+    if (document.activeElement === heading) musicPersonFocusOwners.add(owner);
+  };
+  const selection = musicPersonSelection;
+  const matching = selection?.rect && selection.id === note.dataset.signatureId && performance.now() - selection.at < 5000 && !reducedMotion.matches;
+  let pendingFlight = matching;
+  if (pendingFlight) note.style.visibility = "hidden";
+  const flight = () => {
+    if (!pendingFlight || !owns()) return;
+    const target = note.getBoundingClientRect(), source = selection.rect;
+    if (!target.width || !target.height) return;
+    pendingFlight = false; selection.sourceAnimation?.cancel(); musicPersonSelection = null;
+    note.style.visibility = "";
+    flights.push(note.animate([{ transform: "translate(" + (source.left + source.width / 2 - target.left - target.width / 2) + "px," +
+      (source.top + source.height / 2 - target.top - target.height / 2) + "px) scale(" + source.width / target.width + ")" }, { transform: "none" }],
+      { duration: 320, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both" }));
+    personDetail.querySelectorAll("[data-person-note] > :not([data-person-signature]), [data-person-resonance], [data-person-legacy]")
+      .forEach(node => flights.push(node.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, fill: "both" })));
+    flights[0].finished.then(focusOwner, () => {});
+    flights.forEach(animation => animation.finished.then(() => animation.cancel(), () => {}));
+  };
+  const tick = now => {
+    frame = 0;
+    if (!owns() || !visible || reducedMotion.matches) { last = 0; note.removeAttribute("data-signature-visible"); return; }
+    note.setAttribute("data-signature-visible", "");
+    const delta = last ? Math.min(250, Math.max(0, now - last)) : 0; last = now;
+    advanceMusicPeopleSignatureShimmer(effect, delta);
+    frame = requestAnimationFrame(tick);
+  };
+  const sync = () => {
+    if (frame) cancelAnimationFrame(frame); frame = 0; last = 0;
+    if (reducedMotion.matches) { pendingFlight = false; note.style.visibility = ""; flights.forEach(animation => animation.cancel()); effect.shimmer.setAttribute("opacity", "0"); }
+    flight();
+    flights.forEach(animation => {
+      if (["finished", "idle"].includes(animation.playState)) return;
+      if (owns()) { if (animation.playState === "paused") animation.play(); }
+      else animation.pause();
+    });
+    if (!pendingFlight && flights.every(animation => ["finished", "idle"].includes(animation.playState))) focusOwner();
+    if (owns() && visible && !reducedMotion.matches) frame = requestAnimationFrame(tick);
+    else note.removeAttribute("data-signature-visible");
+  };
+  const observer = typeof IntersectionObserver === "function" ? new IntersectionObserver(entries => {
+    visible = entries[0]?.isIntersecting === true; sync();
+  }, { root: personDetail, threshold: .1 }) : null;
+  observer?.observe(note);
+  const ownerObserver = typeof MutationObserver === "function" ? new MutationObserver(sync) : null;
+  for (let node = note.parentElement; node; node = node.parentElement) ownerObserver?.observe(node, { attributes: true, attributeFilter: ["inert", "aria-hidden", "hidden", "data-v3-booting"] });
+  document.addEventListener("visibilitychange", sync); reducedMotion.addEventListener("change", sync);
+  musicPersonIdentityMotion = { dispose() {
+    disposed = true; if (frame) cancelAnimationFrame(frame); observer?.disconnect(); ownerObserver?.disconnect();
+    document.removeEventListener("visibilitychange", sync); reducedMotion.removeEventListener("change", sync);
+    flights.forEach(animation => animation.cancel()); note.style.visibility = "";
+    note.removeAttribute("data-signature-visible"); effect.shimmer.setAttribute("opacity", "0");
+  } };
+  sync();
 }
 
 // Melody v1: database identity owns variation; documented roles only select notation.
@@ -14837,8 +14911,7 @@ function createMusicPeopleRow(person) {
     row.appendChild(band);
   }
   row.addEventListener("click", () => {
-    setActiveMusicPeopleRow(person.personId);
-    navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
+    enterMusicPersonNote(person, row);
   });
   return row;
 }
@@ -15278,8 +15351,7 @@ function createMusicPeopleEchoToken(record, slotIndex) {
   echo._echoNoteEffect = note._echoNoteEffect;
   echo.append(note, name);
   echo.addEventListener("click", () => {
-    setActiveMusicPeopleRow(person.personId);
-    navigateToRoute(getMusicPersonRouteUrl(person.personId), { historyState: { fromPeopleIndex: true } });
+    enterMusicPersonNote(person, echo);
   });
   return echo;
 }
@@ -15484,30 +15556,9 @@ function startMusicPeopleEchoes() {
       return;
     }
     effect.lastTime = now;
-    if (effect.wait === null) {
-      effect.wait = effect.firstSweep ? 1200 + effect.random() * 2400 : 5000 + effect.random() * 5000;
-      effect.duration = 900 + effect.random() * 200;
-    }
-    if (effect.sweep < 0) {
-      const velocity = (session.width + slot.width) / slot.duration;
-      const budget = velocity > 0 ? Math.max(0, (right - bounds.right - 4) / velocity) : 0;
-      const availableWait = budget - effect.duration - 250;
-      if (availableWait < 0) { pauseNoteEffect(slot); return; }
-      if (effect.firstSweep) effect.wait = Math.min(effect.wait, availableWait);
-      effect.wait -= elapsed;
-      if (effect.wait > 0) return;
-      effect.sweep = 0;
-      effect.firstSweep = false;
-    }
-    effect.sweep += elapsed / effect.duration;
-    if (effect.sweep >= 1) {
-      effect.sweep = -1;
-      effect.wait = 5000 + effect.random() * 5000;
-      effect.shimmer.setAttribute("opacity", "0");
-      return;
-    }
-    effect.shimmer.setAttribute("opacity", ".58");
-    effect.band.setAttribute("transform", `translate(${-16 + effect.sweep * 96} 0)`);
+    const velocity = (session.width + slot.width) / slot.duration;
+    const budget = velocity > 0 ? Math.max(0, (right - bounds.right - 4) / velocity) : 0;
+    if (!advanceMusicPeopleSignatureShimmer(effect, elapsed, budget)) pauseNoteEffect(slot);
   };
   const updateNameEffect = (lane, slot, viewport, now) => {
     const effect = slot.button?._echoNameEffect;
@@ -20068,10 +20119,12 @@ function setPeopleIndexVisible(isVisible) {
   }
 
   if (isVisible) captureMusicPeopleEchoVisitOwner();
+  if (isVisible && getRouteFromUrl().name === "music-people") musicPersonSelection?.sourceAnimation?.cancel();
   if (!isVisible) rememberMusicPeoplePresentationScroll();
   musicPeopleIndex.classList.toggle("is-active", isVisible);
   musicPeopleIndex.setAttribute("aria-hidden", String(!isVisible));
   if (!isVisible) {
+    if (musicPersonSelection?.pending) { musicPersonSelection.sourceAnimation?.cancel(); musicPersonSelection.pending = false; }
     setMusicPeopleTuningOpen(false);
     stopMusicPeopleEchoes();
     clearMusicPeopleLoadingPresentation();
@@ -20488,6 +20541,10 @@ function captureMusicVenueEventsState(view) {
   };
 }
 function captureMusicResumeState(route) {
+  if (route.name === "music-people") return { query: activeMusicPeopleSearch, letter: activeMusicPeopleLetterFilter,
+    category: activeMusicPeopleCategoryFilter, instrument: activeMusicPeopleInstrumentFilter, mode: musicPeoplePresentationMode,
+    positions: { ...musicPeoplePresentationScroll }, focus: document.activeElement?.id || "" };
+
   if (route.name === "music-venues") return {
     browsing: musicVenuesIndex.classList.contains("is-active"),
     search: activeMusicVenueSearch,
@@ -20514,7 +20571,7 @@ function captureMusicResumeState(route) {
         .map(memory => memory.dataset.venueMemoryId).slice(0, 100),
     };
   }
-  if(route.name==='person-detail')return {expanded:[...personDetail.querySelectorAll('.person-show-card.is-expanded')]
+  if(route.name==='person-detail')return {connections:[...personDetail.querySelectorAll('details[open][data-person-connection]')].map(node=>node.dataset.personConnection),focus:document.activeElement?.id || '',expanded:[...personDetail.querySelectorAll('.person-show-card.is-expanded')]
     .map(card=>card.dataset.personShowId+'|'+card.dataset.personShowAlbumId).slice(0,100)};
   if(route.name==='show-detail'){
     const card=showDetail.querySelector('.show-set-carousel-slide.is-active .show-set-card');
@@ -20533,6 +20590,14 @@ function captureMusicResumeState(route) {
   return {letter:activeBandsFilterLetter,region:activeBandsRegionFilter,status:activeBandsStatusFilter,query:bandsSearchTerm,selected:musicSourceResume?.selected || musicBandsIndex.querySelector('.rhythm-source-row.is-active')?.dataset.bandId,count:musicSourceResume?.count || musicBandsIndex.querySelector('[data-rhythm-source-list]')?.children.length || 24,sourceScroll:musicSourceResume?.sourceScroll ?? musicBandsIndex.querySelector('[data-rhythm-rolodex]')?.scrollTop ?? 0};
 }
 function seedMusicResumeState(route,ui) {
+  if (route.name === "music-people") {
+    activeMusicPeopleSearch = v3Text(ui.query); activeMusicPeopleLetterFilter = v3Text(ui.letter);
+    activeMusicPeopleCategoryFilter = v3Text(ui.category); activeMusicPeopleInstrumentFilter = v3Text(ui.instrument);
+    musicPeoplePresentationMode = ui.mode === "directory" ? "directory" : "score";
+    if (ui.positions) { musicPeoplePresentationScroll.score = v3Number(ui.positions.score); musicPeoplePresentationScroll.directory = v3Number(ui.positions.directory); }
+    return;
+  }
+
   if (route.name === "music-venues") {
     activeMusicVenueSearch = v3Text(ui.search);
     activeMusicVenueStateFilter = normalizeMusicVenueState(ui.state);
@@ -20560,6 +20625,21 @@ function settleMusicResumeLanding() {
   });
 }
 function restoreMusicResumeState(route,ui) {
+  if (route.name === "music-people") {
+    if (musicPeopleIndexRequest || ["idle", "loading"].includes(musicPeopleIndexDataState)) return false;
+    if (!musicPeopleList?.clientHeight || !musicPeopleIndex.classList.contains("is-active")
+      || musicPeopleList.closest('[hidden], [inert], [aria-hidden="true"]')
+      || document.documentElement.hasAttribute("data-v3-booting")
+      || getComputedStyle(musicPeopleList).visibility === "hidden") return false;
+    const focus = document.getElementById(v3Text(ui.focus));
+    if (focus && musicPeopleList.contains(focus)) {
+      if (focus.closest('[hidden], [inert], [aria-hidden="true"]') || focus.disabled) return false;
+      focus.focus({ preventScroll: true });
+      if (document.activeElement !== focus) return false;
+    }
+    return true;
+  }
+
   if (route.name === "music-venues") {
     if (!ui.browsing) return true;
     if (musicVenuesRequest || (musicVenueSortUsesShows() && musicShowsSetsRequest)) return false;
@@ -20606,6 +20686,8 @@ function restoreMusicResumeState(route,ui) {
     if(musicShowsSetsRequest)return false;
     if(route.name==='person-detail'){
       if(pending(musicPeopleIndexDataState)||pending(musicBandsIndex.dataset.bandsDataState)||pending(musicShowsSetsDataState)||musicPersonDetailArchiveRequests.has(normalizeMusicPersonId(route.personId)))return false;
+      if(Array.isArray(ui.connections))personDetail.querySelectorAll('details[data-person-connection]').forEach(node=>node.open=ui.connections.includes(node.dataset.personConnection));
+      if(ui.focus)document.getElementById(v3Text(ui.focus))?.focus({preventScroll:true});
       if(Array.isArray(ui.expanded)){
         const expanded=new Set(ui.expanded.filter(key=>typeof key==='string'&&key.length<=300).slice(0,100));
         personDetail.querySelectorAll('.person-show-card').forEach(card=>{
