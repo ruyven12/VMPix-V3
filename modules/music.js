@@ -14428,7 +14428,16 @@ function createMusicPersonShowCard(show, personName) {
   showAction.id = getMusicPersonControlId("show-link", card.dataset.personShowId + "|" + albumId);
   if (show.detailRoute) showAction.href = show.detailRoute; else showAction.hidden = true;
   showAction.addEventListener("click", event => { if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return; event.preventDefault(); navigateToRoute(showAction.getAttribute("href")); });
-  card.append(summary, showAction, action, expanded);
+  const venueAction = document.createElement("a");
+  venueAction.className = "person-show-venue-link"; venueAction.textContent = "Venue Detail";
+  venueAction.id = getMusicPersonControlId("venue-link", card.dataset.personShowId + "|" + albumId);
+  if (show.venueId) venueAction.href = getMusicVenueRouteUrl({ venue_id: show.venueId, venue_key: show.venueId });
+  else venueAction.hidden = true;
+  venueAction.addEventListener("click", event => {
+    if (event.button || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault(); navigateToRoute(venueAction.getAttribute("href"));
+  });
+  card.append(summary, showAction, venueAction, action, expanded);
   return card;
 }
 
@@ -14471,47 +14480,33 @@ function createMusicPersonConnectionLink(label, url, key = label) {
 
 function renderMusicPersonConnections(data) {
   const section = document.createElement("section"); section.dataset.personResonance = "";
-  const title = document.createElement("h4"); title.textContent = "Resonance"; section.append(title);
-  const shows = [...new Map(data.taggedShows.filter(show => show.documentedShowId).map(show => [show.documentedShowId, show])).values()];
-  const venues = [...new Map(data.taggedShows.filter(show => show.venueId).map(show => [show.venueId, show])).values()];
-  const categories = [
-    ["bands", "Bands", data.associatedBands, band => {
-      const card = createMusicPersonAssociatedBand(band);
-      if (band.bandId) card.append(createMusicPersonConnectionLink("Band Detail", getBandRouteUrl(band.bandId), band.bandId + "|" + band.name));
-      return card;
-    }],
-    ["shows", "Shows", shows, show => createMusicPersonConnectionLink(show.title, show.detailRoute, show.documentedShowId)],
-    ["venues", "Venues", venues, show => createMusicPersonConnectionLink(show.venue,
-      getMusicVenueRouteUrl({ venue_id: show.venueId, venue_key: show.venueId }), show.venueId)]
-  ];
-  for (const [key, label, rows, render] of categories) {
-    const group = document.createElement("details"); group.dataset.personConnection = key;
-    const summary = document.createElement("summary");
-    summary.id = getMusicPersonControlId("connections", key);
-    const pendingFeed = ["idle", "loading", "error"].includes(key === "bands" ? musicBandsIndex.dataset.bandsDataState : musicShowsSetsDataState);
-    summary.textContent = label + (rows.length || !pendingFeed ? " · " + rows.length : " · " + ((key === "bands" ? musicBandsIndex.dataset.bandsDataState : musicShowsSetsDataState) === "error" ? "Unavailable" : "Loading"));
-    const list = document.createElement("div"); list.className = "person-connection-list";
-    rows.forEach(row => list.append(render(row)));
-    if (!rows.length && !["idle", "loading", "error"].includes(key === "bands" ? musicBandsIndex.dataset.bandsDataState : musicShowsSetsDataState)) { const empty = document.createElement("p"); empty.textContent = "No documented connections available."; list.append(empty); }
-    const feedState = key === "bands" ? musicBandsIndex.dataset.bandsDataState : musicShowsSetsDataState;
-    if (["idle", "loading", "error"].includes(feedState)) {
-      const status = document.createElement("p");
-      status.textContent = feedState === "error" ? "Connection details are unavailable." : "Checking documented connections…";
-      list.append(status);
-      if (feedState === "error") {
-        const retry = document.createElement("button"); retry.type = "button"; retry.textContent = "Retry connections";
-        retry.addEventListener("click", () => {
-          const owner = v3RouteContext;
-          if (key === "bands") musicBandsIndexLoaded = false;
-          else { musicShowsSetsLoaded = false; musicShowsIndexDataRequested = false; }
-          const request = key === "bands" ? requestMusicBandsIndexData() : requestMusicShowsSetsData();
-          request.then(() => { if (v3RouteContext === owner && getRouteFromUrl().name === "person-detail") renderMusicPersonDetail(getMusicPersonDetailData(activeMusicPersonDetailId)); });
+  const bands = Array.isArray(data.associatedBands) ? data.associatedBands : [];
+  section.hidden = bands.length === 0;
+  const title = document.createElement("h4"); title.textContent = "Resonance";
+  const list = document.createElement("div"); list.className = "person-connection-list";
+  bands.forEach(band => {
+    const card = createMusicPersonAssociatedBand(band);
+    if (band.bandId) card.append(createMusicPersonConnectionLink("Band Detail", getBandRouteUrl(band.bandId), band.bandId + "|" + band.name));
+    list.append(card);
+  });
+  section.append(title, list);
+  if (bands.length && ["idle", "loading", "error"].includes(musicBandsIndex.dataset.bandsDataState)) {
+    const status = document.createElement("p"); status.className = "person-band-status";
+    const failed = musicBandsIndex.dataset.bandsDataState === "error";
+    status.textContent = failed ? "Band details are unavailable." : "Checking band details…";
+    if (failed) {
+      const retry = document.createElement("button"); retry.type = "button"; retry.textContent = "Retry connections";
+      retry.id = getMusicPersonControlId("band-retry", "connections");
+      retry.addEventListener("click", () => {
+        const owner = v3RouteContext; retry.disabled = true; musicBandsIndexLoaded = false;
+        requestMusicBandsIndexData().then(() => {
+          if (v3RouteContext === owner && getRouteFromUrl().name === "person-detail")
+            renderMusicPersonDetail(getMusicPersonDetailData(activeMusicPersonDetailId));
         });
-        list.append(retry);
-      }
+      });
+      status.append(" ", retry);
     }
-
-    group.append(summary, list); section.append(group);
+    section.append(status);
   }
   return section;
 }
@@ -14523,9 +14518,9 @@ function renderMusicPersonDetail(data) {
     renderMusicPersonDetailState(data); return;
   }
   const same = personDetail.dataset.personIdentity === data.personId && personDetail.querySelector("[data-person-note]");
-  const open = [...personDetail.querySelectorAll("details[open]")].map(node => node.dataset.personConnection);
   const expanded = new Set([...personDetail.querySelectorAll(".person-show-card.is-expanded")].map(card => card.dataset.personShowId + "|" + card.dataset.personShowAlbumId));
-  const top = personDetail.scrollTop, focused = document.activeElement, connection = focused?.closest("[data-person-connection]")?.dataset.personConnection;
+  const top = personDetail.scrollTop, focused = document.activeElement;
+  const resonanceFocus = personDetail.querySelector("[data-person-resonance]")?.contains(focused) ? focused.id : "";
   disconnectMusicPersonTaggedShowHydrationObserver();
   if (!same) musicPersonTaggedShowHydrationToken++;
   if (!same) {
@@ -14577,23 +14572,30 @@ function renderMusicPersonDetail(data) {
       action.dataset.showRoute = fresh.dataset.showRoute || ""; action.disabled = fresh.disabled;
       const link = retained.querySelector(".person-show-detail-link"), newLink = card.querySelector(".person-show-detail-link");
       link.hidden = newLink.hidden; if (newLink.hasAttribute("href")) link.href = newLink.href;
+      const venueLink = retained.querySelector(".person-show-venue-link"), newVenueLink = card.querySelector(".person-show-venue-link");
+      venueLink.hidden = newVenueLink.hidden;
+      if (newVenueLink.hasAttribute("href")) venueLink.href = newVenueLink.href;
     });
   }
   const oldResonance = personDetail.querySelector("[data-person-resonance]");
-  if (oldResonance) oldResonance.replaceChildren(...resonance.childNodes);
+  if (oldResonance) {
+    oldResonance.hidden = resonance.hidden;
+    oldResonance.replaceChildren(...resonance.childNodes);
+  }
   else personDetail.append(resonance);
   if (!keepLegacy) {
     if (oldLegacy) oldLegacy.replaceChildren(...legacy.childNodes);
     else personDetail.append(legacy);
   }
-  open.forEach(key => { const group = [...personDetail.querySelectorAll("[data-person-resonance] details")].find(node => node.dataset.personConnection === key); if (group) group.open = true; });
   if (same) {
     personDetail.scrollTop = top;
     personDetail.querySelectorAll("[data-person-legacy] .person-show-card").forEach(card => {
       if (card.classList.contains("is-expanded") !== expanded.has(card.dataset.personShowId + "|" + card.dataset.personShowAlbumId)) toggleMusicPersonShowCard(card);
     });
-    if (connection && document.activeElement === document.body) [...personDetail.querySelectorAll("[data-person-resonance] details")]
-      .find(node => node.dataset.personConnection === connection)?.querySelector("summary").focus({ preventScroll: true });
+    if (resonanceFocus && document.activeElement === document.body) {
+      const target = document.getElementById(resonanceFocus);
+      (target && !target.closest("[hidden]") ? target : personDetail.querySelector("#person-detail-title"))?.focus({ preventScroll: true });
+    }
   }
   hydrateMusicPersonTaggedShowPhotos(data, { keepToken: !!same }); startMusicPersonIdentityMotion();
 }
@@ -20686,13 +20688,22 @@ function restoreMusicResumeState(route,ui) {
     if(musicShowsSetsRequest)return false;
     if(route.name==='person-detail'){
       if(pending(musicPeopleIndexDataState)||pending(musicBandsIndex.dataset.bandsDataState)||pending(musicShowsSetsDataState)||musicPersonDetailArchiveRequests.has(normalizeMusicPersonId(route.personId)))return false;
+      if (!personDetail.isConnected || !personDetail.clientHeight
+        || personDetail.closest('[hidden], [inert], [aria-hidden="true"]')
+        || document.documentElement.hasAttribute("data-v3-booting")
+        || getComputedStyle(personDetail).visibility === "hidden") return false;
       if(Array.isArray(ui.connections))personDetail.querySelectorAll('details[data-person-connection]').forEach(node=>node.open=ui.connections.includes(node.dataset.personConnection));
-      if(ui.focus)document.getElementById(v3Text(ui.focus))?.focus({preventScroll:true});
       if(Array.isArray(ui.expanded)){
         const expanded=new Set(ui.expanded.filter(key=>typeof key==='string'&&key.length<=300).slice(0,100));
         personDetail.querySelectorAll('.person-show-card').forEach(card=>{
           if(card.classList.contains('is-expanded')!==expanded.has(card.dataset.personShowId+'|'+card.dataset.personShowAlbumId))toggleMusicPersonShowCard(card);
         });
+      }
+      const focus = document.getElementById(v3Text(ui.focus));
+      if (focus && personDetail.contains(focus)) {
+        if (focus.closest('[hidden], [inert], [aria-hidden="true"]') || focus.disabled) return false;
+        focus.focus({ preventScroll: true });
+        if (document.activeElement !== focus) return false;
       }
     }else if(route.name==='show-detail'){
       if(pending(musicShowsSetsDataState))return false;

@@ -35764,28 +35764,26 @@ html[data-v3-booting] .music-people-loading :is(.music-people-loading-motif, .mu
 .person-detail-screen .person-detail-archive-value { color: #f0e3f1; }
 .person-detail-screen :is([data-person-resonance], [data-person-legacy]) { display: grid; gap: 1rem; padding: 0; border: 0; background: none; overflow: visible; }
 .person-detail-screen :is(h4, h5) { margin: 0; text-align: center; color: #e1c596; font-weight: 400; font-size: 1.2rem; }
-.person-detail-screen [data-person-connection] { border-block-start: 1px solid rgba(225,197,150,.18); }
-.person-detail-screen [data-person-connection] summary { min-height: 44px; padding: .7rem; cursor: pointer; color: #e9d5ef; font-size: 1rem; }
-.person-detail-screen .person-connection-list { display: grid; gap: .8rem; padding: .5rem .5rem 1rem; }
-.person-detail-screen .person-connection-list > :is(a, span) { justify-self: center; }
+.person-detail-screen [data-person-resonance][hidden] { display: none; }
+.person-detail-screen .person-connection-list { display: flex; flex-wrap: wrap; justify-content: center; align-items: start; gap: 1rem; padding: .5rem; }
 .person-detail-screen :is(a, button) { min-height: 44px; }
 .person-detail-screen a { color: #e1c596; padding: .5rem; overflow-wrap: anywhere; }
 .person-detail-screen :is(a, button, summary):focus-visible { outline: 2px solid #e3b7f0; outline-offset: 2px; }
-.person-detail-screen .person-detail-band-card { background: rgba(9,6,15,.65); border-color: rgba(225,197,150,.15); justify-items: center; }
+.person-detail-screen .person-detail-band-card { width: clamp(9rem, 34vw, 14rem); max-width: 100%; background: rgba(9,6,15,.65); border-color: rgba(225,197,150,.15); justify-items: center; text-align: center; }
+.person-detail-screen .person-detail-band-instruments { justify-content: center; }
+.person-detail-screen .person-band-status { margin: 0; text-align: center; color: #d4bedc; font-size: .86rem; line-height: 1.5; }
+.person-detail-screen .person-detail-band-name-pill { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
 .person-detail-screen .person-legacy-show { display: grid; gap: .75rem; }
 .person-detail-screen .person-show-card { border-color: rgba(225,197,150,.2); background: rgba(9,6,15,.74); }
 .person-detail-screen .person-show-date { background: rgba(225,197,150,.06); color: #e1c596; }
-.person-detail-screen .person-show-detail-link { justify-self: end; font-size: .86rem; }
-.person-detail-screen .person-show-detail-link[hidden] { display: none; }
-.person-detail-screen :is(.person-detail-back, .person-show-view, [data-person-gallery-status] button, [data-person-detail-retry]) {
+.person-detail-screen :is(.person-show-detail-link, .person-show-venue-link) { justify-self: end; font-size: .86rem; }
+.person-detail-screen :is(.person-show-detail-link, .person-show-venue-link)[hidden] { display: none; }
+.person-detail-screen :is(.person-detail-back, .person-show-view, .person-band-status button, [data-person-gallery-status] button, [data-person-detail-retry]) {
   background: rgba(9,6,15,.82); color: #e1c596; border: 1px solid rgba(225,197,150,.24); border-radius: .45rem; padding: .5rem .85rem;
 }
 .person-detail-screen .person-detail-back { justify-self: start; }
 .person-detail-screen [data-person-gallery-status] { padding: .75rem; color: #e9d5ef; line-height: 1.5; }
 .person-detail-screen .person-detail-state { background: rgba(9,6,15,.72); text-transform: none; }
-@media (min-width: 64rem) {
-  .person-detail-screen .person-connection-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
-}
 @media (prefers-reduced-motion: reduce) {
   .person-detail-screen [data-person-signature][data-signature-id] { animation: none; }
 }

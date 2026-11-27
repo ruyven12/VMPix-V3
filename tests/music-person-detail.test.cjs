@@ -349,3 +349,106 @@ test('authoritative zero suppresses real stale photo fallbacks while retaining a
   assert.equal(result.taggedShows.length, 0); assert.equal(result.associatedBands[0], band);
   assert.equal(result.archiveRows.find(row => row.label === 'Verified photographs').value, '0');
 });
+
+function resonanceFixture(state = 'live') {
+  const created = [], navigation = [];
+  function node(tag) {
+    const value = { tag, dataset: {}, children: [], hidden: false, listeners: {}, textContent: '',
+      append(...children) { this.children.push(...children); },
+      replaceChildren(...children) { this.children = children; },
+      addEventListener(name, handler) { this.listeners[name] = handler; },
+      querySelectorAll() { return []; }, contains() { return false; } };
+    Object.defineProperty(value, 'childNodes', { get() { return this.children; } });
+    created.push(value); return value;
+  }
+  const ctx = vm.createContext({ document: { createElement: node }, musicBandsIndex: { dataset: { bandsDataState: state } },
+    createMusicPersonAssociatedBand: band => Object.assign(node('article'), { band }),
+    getMusicPersonControlId: (kind, key) => 'person-' + kind + '-1|' + key,
+    getBandRouteUrl: id => '/music/bands/' + id,
+    navigateToRoute: url => navigation.push(url) });
+  load(ctx, 'createMusicPersonConnectionLink'); load(ctx, 'renderMusicPersonConnections');
+  return { ctx, created, navigation, node };
+}
+test('Resonance directly renders every documented Band and preserves native stable-ID links without disclosures', () => {
+  const f = resonanceFixture();
+  const section = f.ctx.renderMusicPersonConnections({
+    associatedBands: [{ name: 'First Band', bandId: 'first' }, { name: 'Second Band', bandId: 'second' }],
+    get taggedShows() { throw Error('Resonance must not create Show or Venue sections'); }
+  });
+  assert.equal(section.hidden, false); assert.equal(section.children[0].textContent, 'Resonance');
+  assert.equal(section.children[1].children.length, 2);
+  assert(!f.created.some(node => ['details', 'summary'].includes(node.tag)));
+  const links = f.created.filter(node => node.tag === 'a');
+  assert.equal(links.length, 2); assert.equal(links[0].href, '/music/bands/first');
+  assert(links.every(node => node.id.startsWith('person-connection-1|')));
+});
+test('Resonance hides without documented Bands and keeps optional Band recovery beside populated cards', () => {
+  const f = resonanceFixture('error');
+  const empty = f.ctx.renderMusicPersonConnections({ associatedBands: [] });
+  assert.equal(empty.hidden, true);
+  assert(!empty.children.some(node => node.className === 'person-band-status'));
+  const populated = f.ctx.renderMusicPersonConnections({ associatedBands: [{ name: 'Authored Band' }] });
+  assert.equal(populated.hidden, false);
+  const status = populated.children.find(node => node.className === 'person-band-status');
+  assert.equal(status.textContent, 'Band details are unavailable.');
+  assert(status.children.some(node => node.tag === 'button' && node.textContent === 'Retry connections'));
+});
+test('retained Resonance wrapper follows late no-band/populated/no-band data without replacing identity or Legacy', () => {
+  const f = resonanceFixture(), resonance = f.node('section'), legacy = f.node('section'), hero = {}, title = {};
+  resonance.hidden = true;
+  const copy = { querySelector(selector) { return selector === 'h3' ? title : selector === '.person-detail-pill-list' ? { replaceWith() {} } : null; } };
+  const body = {};
+  const root = { dataset: { personIdentity: '1' }, scrollTop: 145,
+    querySelector(selector) { return ({ '[data-person-note]': hero, '.person-detail-copy': copy,
+      '.person-detail-archive-data': { replaceChildren() {} }, '[data-person-resonance]': resonance,
+      '[data-person-legacy]': legacy })[selector] || null; },
+    querySelectorAll() { return []; }, replaceChildren() { throw Error('Identity replaced'); },
+    append() { throw Error('Retained wrappers replaced'); } };
+  Object.assign(f.ctx, { document: { ...f.ctx.document, activeElement: body, body }, personDetail: root,
+    disconnectMusicPersonTaggedShowHydrationObserver() {}, musicPersonTaggedShowHydrationToken: 1,
+    createMusicPersonPillList: () => f.node('div'), createMusicPersonArchiveBlock: () => f.node('dl'),
+    createMusicPersonEmptyState: () => f.node('p'), hydrateMusicPersonTaggedShowPhotos() {},
+    startMusicPersonIdentityMotion() {}, toggleMusicPersonShowCard() {} });
+  load(f.ctx, 'renderMusicPersonDetail');
+  const data = { state: 'ready', personId: '1', name: 'Person', aliases: [], taggedShows: [], associatedBands: [], archiveRows: [] };
+  f.ctx.renderMusicPersonDetail(data); assert.equal(resonance.hidden, true);
+  f.ctx.renderMusicPersonDetail({ ...data, associatedBands: [{ name: 'Late Band', bandId: 'late' }] });
+  assert.equal(resonance.hidden, false); assert.equal(resonance.children[1].children.length, 1);
+  f.ctx.renderMusicPersonDetail(data); assert.equal(resonance.hidden, true);
+  assert.equal(root.scrollTop, 145);
+});
+test('direct Band links preserve modified clicks while ordinary activation uses the existing router', () => {
+  const f = resonanceFixture();
+  const link = f.ctx.createMusicPersonConnectionLink('Band Detail', '/music/bands/first', 'first');
+  let prevented = 0;
+  link.listeners.click({ button: 0, ctrlKey: true, preventDefault() { prevented++; } });
+  assert.equal(prevented, 0); assert.equal(f.navigation.length, 0);
+  link.listeners.click({ button: 0, preventDefault() { prevented++; } });
+  assert.equal(prevented, 1); assert.equal(f.navigation[0], '/music/bands/first');
+});
+
+test('Person resume waits through covered-sweep and failed focus, restoring expansion before source focus', () => {
+  let blocked = true, focusAllowed = false, expanded = false;
+  const doc = { activeElement: { id: 'engine-back' }, documentElement: { hasAttribute: () => false },
+    getElementById: () => focus };
+  const focus = { disabled: false, closest: () => expanded ? null : {},
+    focus() { if (focusAllowed) doc.activeElement = focus; } };
+  const card = { dataset: { personShowId: 'S1', personShowAlbumId: 'A1' }, classList: { contains: () => expanded } };
+  const ctx = vm.createContext({ document: doc, musicShowsSetsRequest: null,
+    musicPeopleIndexDataState: 'live', musicShowsSetsDataState: 'live',
+    musicBandsIndex: { dataset: { bandsDataState: 'live' } },
+    musicPersonDetailArchiveRequests: new Map(), normalizeMusicPersonId: String,
+    personDetail: { isConnected: true, clientHeight: 700, closest: () => blocked ? {} : null,
+      contains: node => node === focus, querySelectorAll: selector => selector === '.person-show-card' ? [card] : [] },
+    getComputedStyle: () => ({ visibility: 'visible' }), v3Text: value => value || '',
+    toggleMusicPersonShowCard() { expanded = !expanded; } });
+  load(ctx, 'restoreMusicResumeState');
+  const route = { name: 'person-detail', personId: '1' }, ui = { focus: 'person-connection-1', expanded: ['S1|A1'] };
+  assert.equal(ctx.restoreMusicResumeState(route, ui), false);
+  blocked = false;
+  assert.equal(ctx.restoreMusicResumeState(route, ui), false);
+  assert.equal(expanded, true);
+  focusAllowed = true;
+  assert.equal(ctx.restoreMusicResumeState(route, ui), true);
+  assert.equal(doc.activeElement, focus);
+});
