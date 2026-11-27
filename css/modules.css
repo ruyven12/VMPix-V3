@@ -35733,11 +35733,11 @@ html[data-v3-booting] .music-people-loading :is(.music-people-loading-motif, .mu
   gap: clamp(1.5rem, 4vw, 3rem); scrollbar-color: rgba(225,197,150,.5) transparent;
 }
 .person-detail-screen :is([data-person-note], [data-person-resonance], [data-person-legacy]) {
-  width: min(100%, 64rem); justify-self: center; min-width: 0; position: relative;
+  width: min(100%, 64rem); justify-self: center; min-width: 0; position: relative; background: rgba(9,6,15,.45);
 }
 .person-detail-screen .person-detail-hero {
   display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: .85rem;
-  padding: 1rem 0; border: 0; background: none; border-radius: 0; overflow: visible; text-align: center;
+  padding: 1rem 0; border: 0; border-radius: 0; overflow: visible; text-align: center;
 }
 .person-detail-screen :is(.person-detail-hero, .person-tagged-shows)::before { content: none; }
 .person-detail-screen .person-detail-kicker { font-size: .88rem; color: #e1c596; letter-spacing: .13em; }
@@ -35753,28 +35753,37 @@ html[data-v3-booting] .music-people-loading :is(.music-people-loading-motif, .mu
 .person-detail-screen .person-detail-copy { justify-items: center; width: 100%; gap: .7rem; }
 .person-detail-screen .person-detail-name { font-size: clamp(1.8rem, 6vw, 3.6rem); line-height: 1.12; color: #f3e9f5; }
 .person-detail-screen .person-detail-pill-list { justify-content: center; }
-.person-detail-screen :is(.person-detail-pill, .person-detail-band-name-pill) { background: rgba(16,10,24,.6); border-color: rgba(225,197,150,.2); color: #e1c596; }
+.person-detail-screen :is(.person-detail-pill, .person-detail-band-name-pill) { background: none; border-color: rgba(225,197,150,.2); color: #e1c596; }
 .person-detail-screen .person-detail-aliases { margin: 0; color: #d4bedc; line-height: 1.5; }
 .person-detail-screen .person-detail-archive-data {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: .8rem 1.5rem; border: 0; background: none; padding: .75rem;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; gap: 1rem .5rem; border: 0; background: none; padding: .75rem; text-align: center;
 }
-.person-detail-screen .person-detail-archive-row { display: grid; justify-items: center; gap: .3rem; }
+.person-detail-screen .person-detail-archive-row { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: .3rem; }
+.person-detail-screen .person-detail-archive-row[data-person-stat="photographs"] { grid-column: 1; }
+.person-detail-screen .person-detail-archive-row[data-person-stat="sets"] { grid-column: 2; }
+.person-detail-screen .person-detail-archive-row[data-person-stat="shows"] { grid-column: 3; }
+.person-detail-screen .person-detail-archive-row[data-person-stat="span"] { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: center; gap: .15rem; }
+.person-detail-screen .person-detail-archive-row[data-person-stat="span"] :is(dt, dd) { font-size: .8rem; }
+.person-detail-screen .person-detail-archive-row:not([data-person-stat="span"]) .person-detail-archive-value { grid-row: 1; font-size: clamp(1.3rem, 5vw, 1.8rem); }
+.person-detail-screen .person-detail-archive-row:not([data-person-stat="span"]) .person-detail-archive-label { grid-row: 2; }
 .person-detail-screen :is(.person-detail-archive-label, .person-detail-archive-value) { font-size: .86rem; line-height: 1.4; }
 .person-detail-screen .person-detail-archive-label { color: #cbb9d4; }
 .person-detail-screen .person-detail-archive-value { color: #f0e3f1; }
-.person-detail-screen :is([data-person-resonance], [data-person-legacy]) { display: grid; gap: 1rem; padding: 0; border: 0; background: none; overflow: visible; }
+.person-detail-screen :is([data-person-resonance], [data-person-legacy]) { display: grid; gap: 1rem; padding: 0; border: 0; overflow: visible; }
 .person-detail-screen :is(h4, h5) { margin: 0; text-align: center; color: #e1c596; font-weight: 400; font-size: 1.2rem; }
 .person-detail-screen [data-person-resonance][hidden] { display: none; }
 .person-detail-screen .person-connection-list { display: flex; flex-wrap: wrap; justify-content: center; align-items: start; gap: 1rem; padding: .5rem; }
 .person-detail-screen :is(a, button) { min-height: 44px; }
 .person-detail-screen a { color: #e1c596; padding: .5rem; overflow-wrap: anywhere; }
 .person-detail-screen :is(a, button, summary):focus-visible { outline: 2px solid #e3b7f0; outline-offset: 2px; }
-.person-detail-screen .person-detail-band-card { width: clamp(9rem, 34vw, 14rem); max-width: 100%; background: rgba(9,6,15,.65); border-color: rgba(225,197,150,.15); justify-items: center; text-align: center; }
+.person-detail-screen .person-detail-band-card { width: clamp(9rem, 34vw, 14rem); max-width: 100%; background: none; border-color: rgba(225,197,150,.15); justify-items: center; text-align: center; }
+.person-detail-screen :is(.person-detail-band-thumb, .person-detail-band-thumb.has-logo) { background: none; }
 .person-detail-screen .person-detail-band-instruments { justify-content: center; }
 .person-detail-screen .person-band-status { margin: 0; text-align: center; color: #d4bedc; font-size: .86rem; line-height: 1.5; }
 .person-detail-screen .person-detail-band-name-pill { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.person-detail-screen [data-person-legacy] .person-detail-empty-state { background: none; }
 .person-detail-screen .person-legacy-show { display: grid; gap: .75rem; }
-.person-detail-screen .person-show-card { border-color: rgba(225,197,150,.2); background: rgba(9,6,15,.74); }
+.person-detail-screen .person-show-card { border-color: rgba(225,197,150,.2); background: none; }
 .person-detail-screen .person-show-date { background: rgba(225,197,150,.06); color: #e1c596; }
 .person-detail-screen :is(.person-show-detail-link, .person-show-venue-link) { justify-self: end; font-size: .86rem; }
 .person-detail-screen :is(.person-show-detail-link, .person-show-venue-link)[hidden] { display: none; }
@@ -35791,7 +35800,7 @@ html[data-v3-booting] .music-people-loading :is(.music-people-loading-motif, .mu
 /* M6.2B: one collapsed, centered gallery header per Show; albums retain their own data. */
 .person-detail-screen .person-legacy-show {
   display: grid; gap: .45rem; min-width: 0; padding: .75rem;
-  border: 1px solid rgba(225,197,150,.2); border-radius: .6rem; background: rgba(9,6,15,.74);
+  border: 1px solid rgba(225,197,150,.2); border-radius: .6rem; background: none;
 }
 .person-detail-screen .person-legacy-show-title {
   width: 100%; min-height: 44px; padding: .5rem; border: 0; background: none;

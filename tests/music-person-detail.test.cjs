@@ -543,7 +543,7 @@ test('Legacy shows start collapsed with one title trigger/action row while album
   assert.equal(group.querySelectorAll('.person-show-view').length, 0);
   assert.equal(group.querySelectorAll('.person-show-detail-link').length, 1);
   assert.equal(group.querySelectorAll('.person-show-venue-link').length, 1);
-  assert.equal(group.querySelector('.person-legacy-show-count').textContent, '3 Verified Photograph');
+  assert.equal(group.querySelector('.person-legacy-show-count').textContent, '3 Photograph');
   const cards = group.querySelectorAll('.person-show-card');
   assert.deepEqual(cards.map(card => card.dataset.personShowAlbumId), ['A', 'B']);
   assert(cards.every(card => !card.classList.contains('is-expanded')));
@@ -779,4 +779,92 @@ test('same-entry Back before old completion resets visual busy state and an old 
   assert.equal(visibleLegacyThumbs(group).length, 4);
   resolves[1]({ isComplete: true, matchedPhotos: photoKeys(19).map(image_key => ({ image_key })) });
   assert.equal(await second, true); assert.equal(visibleLegacyThumbs(group).length, 19);
+});
+
+
+function archivePresentationFixture() {
+  const f = legacyFixture();
+  Object.assign(f.ctx, {
+    musicArchiveTimestampDateFormatter: new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', year: 'numeric', month: '2-digit', day: '2-digit' })
+  });
+  ['getMusicArchiveTimestampDateParts', 'getMusicPersonArchiveDateParts', 'isValidMusicPersonArchiveDateParts',
+    'formatMusicPersonArchiveDateParts', 'createMusicPersonArchiveBlock'].forEach(name => load(f.ctx, name));
+  return f;
+}
+test('presentation orders Photographs, Sets, Shows and preserves zero while omitting missing statistics', () => {
+  const f = archivePresentationFixture();
+  const rows = [{ label: 'Documented shows', value: '2' }, { label: 'Verified photographs', value: '0' },
+    { label: 'Archived sets', value: '7' }];
+  const block = f.ctx.createMusicPersonArchiveBlock(rows);
+  assert.deepEqual(block.children.map(row => row.querySelector('dt').textContent), ['Photographs', 'Sets', 'Shows']);
+  assert.deepEqual(block.children.map(row => row.querySelector('dd').textContent), ['0', '7', '2']);
+  assert.deepEqual(block.children.map(row => row.dataset.personStat), ['photographs', 'sets', 'shows']);
+  const missing = f.ctx.createMusicPersonArchiveBlock([{ label: 'Verified photographs', value: '0' }]);
+  assert.equal(missing.children.length, 1);
+  assert.equal(missing.children[0].querySelector('dd').textContent, '0');
+  assert.equal(f.ctx.createMusicPersonArchiveBlock([]).children.length, 0);
+  assert.equal(rows[1].label, 'Verified photographs', 'authoritative source rows are not relabelled');
+});
+test('photography span displays both validated endpoints in month/day/year order', () => {
+  const f = archivePresentationFixture();
+  const block = f.ctx.createMusicPersonArchiveBlock([
+    { label: 'First photographed', value: '03/17/2019' }, { label: 'Latest photographed', value: '09/27/2025' }
+  ]);
+  assert.equal(block.children.length, 1);
+  assert.equal(block.children[0].dataset.personStat, 'span');
+  assert.equal(block.querySelector('dt').textContent, 'Span of Photography:');
+  assert.equal(block.querySelector('dd').textContent, '03/17/2019 \u2013 09/27/2025');
+});
+test('equal validated photography endpoints display one date', () => {
+  const f = archivePresentationFixture();
+  const block = f.ctx.createMusicPersonArchiveBlock([
+    { label: 'First photographed', value: '3/7/2025' }, { label: 'Latest photographed', value: '03/07/2025' }
+  ]);
+  assert.equal(block.querySelector('dd').textContent, '03/07/2025');
+});
+test('photography span stays absent when either endpoint is missing or invalid', () => {
+  const f = archivePresentationFixture();
+  for (const [first, latest] of [[undefined, '09/27/2025'], ['03/17/2019', undefined],
+    ['02/30/2025', '09/27/2025'], ['03/17/2019', '13/27/2025'], ['Pending', '09/27/2025'], ['09/27/2025', '03/17/2019']]) {
+    const rows = [{ label: 'First photographed', value: first }, { label: 'Latest photographed', value: latest }];
+    assert.equal(f.ctx.createMusicPersonArchiveBlock(rows).children.length, 0);
+  }
+});
+test('loading and error Note states keep status/Retry semantics without an upper Back control', () => {
+  const f = legacyFixture();
+  Object.assign(f.ctx, { personDetail: f.root, musicPeopleIndexRequest: null });
+  load(f.ctx, 'renderMusicPersonDetailState');
+  f.ctx.renderMusicPersonDetailState({ state: 'loading' });
+  assert.equal(f.root.children.length, 1);
+  assert.equal(f.root.querySelector('.person-detail-state').getAttribute('role'), 'status');
+  assert.equal(f.root.querySelector('h3').textContent, 'Tuning the Note');
+  assert.equal(f.root.querySelector('.person-detail-back'), null);
+  assert.equal(f.root.querySelector('button'), null);
+  f.ctx.renderMusicPersonDetailState({ state: 'error', title: 'Unavailable', copy: 'Try again.' });
+  assert.equal(f.root.children.length, 1);
+  assert.equal(f.root.querySelector('.person-detail-back'), null);
+  const retry = f.root.querySelector('[data-person-detail-retry]');
+  assert.equal(retry.textContent, 'Retry'); assert.equal(retry.disabled, false);
+});
+test('ready Note has no upper Back and metadata enrichment retains the archive handoff wrapper', () => {
+  const f = archivePresentationFixture();
+  Object.assign(f.ctx, { personDetail: f.root,
+    stopMusicPersonIdentityMotion() {}, startMusicPersonIdentityMotion() {},
+    disconnectMusicPersonTaggedShowHydrationObserver() {}, hydrateMusicPersonTaggedShowPhotos() {},
+    getMusicPeopleSignatureDescriptor: () => ({}),
+    createMusicPeopleEchoNote: () => { const note = f.node('span'), svg = f.node('svg');
+      svg.style = { setProperty() {} }; note.append(svg); return note; },
+    createMusicPersonPillList: () => Object.assign(f.node('div'), { className: 'person-detail-pill-list' }),
+    renderMusicPersonConnections: () => Object.assign(f.node('section'), { dataset: { personResonance: '' }, hidden: true })
+  });
+  load(f.ctx, 'renderMusicPersonDetail');
+  const data = { state: 'ready', personId: '1', name: 'Person', aliases: [], taggedShows: [],
+    archiveRows: [{ label: 'Verified photographs', value: '39' }] };
+  f.ctx.renderMusicPersonDetail(data);
+  const archive = f.root.querySelector('.person-detail-archive-data');
+  assert(archive); assert.equal(f.root.querySelector('.person-detail-back'), null);
+  f.ctx.renderMusicPersonDetail({ ...data, archiveRows: [{ label: 'Verified photographs', value: '40' }] });
+  assert.equal(f.root.querySelector('.person-detail-archive-data'), archive);
+  assert.equal(archive.querySelector('dd').textContent, '40');
+  assert.equal(f.root.querySelector('.person-detail-back'), null);
 });

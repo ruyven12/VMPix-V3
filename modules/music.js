@@ -13603,18 +13603,29 @@ function createMusicPersonPillList(data) {
 function createMusicPersonArchiveBlock(rows) {
   const archiveBlock = document.createElement("dl");
   archiveBlock.className = "person-detail-archive-data";
-  rows.forEach((row) => {
+  const appendRow = (labelText, valueText, kind) => {
     const item = document.createElement("div");
     item.className = "person-detail-archive-row";
+    item.dataset.personStat = kind;
     const label = document.createElement("dt");
     label.className = "person-detail-archive-label";
-    label.textContent = row.label;
+    label.textContent = labelText;
     const value = document.createElement("dd");
     value.className = "person-detail-archive-value";
-    value.textContent = getMusicPeopleText(row.value) || "Pending";
+    value.textContent = valueText;
     item.append(label, value);
     archiveBlock.append(item);
+  };
+  [["Photographs", "Verified photographs"], ["Sets", "Archived sets"], ["Shows", "Documented shows"]].forEach(([label, sourceLabel]) => {
+    const row = rows.find(item => item.label === sourceLabel);
+    if (row && getMusicPeopleText(row.value)) appendRow(label, getMusicPeopleText(row.value), label.toLowerCase());
   });
+  const firstParts = getMusicPersonArchiveDateParts(rows.find(row => row.label === "First photographed")?.value);
+  const latestParts = getMusicPersonArchiveDateParts(rows.find(row => row.label === "Latest photographed")?.value);
+  const first = formatMusicPersonArchiveDateParts(firstParts), latest = formatMusicPersonArchiveDateParts(latestParts);
+  if (first && latest && Date.UTC(firstParts.year, firstParts.month - 1, firstParts.day) <= Date.UTC(latestParts.year, latestParts.month - 1, latestParts.day)) {
+    appendRow("Span of Photography:", first === latest ? first : first + " \u2013 " + latest, "span");
+  }
   return archiveBlock;
 }
 
@@ -14355,8 +14366,6 @@ function createMusicPersonShowCard(show, personName) {
 }
 
 function renderMusicPersonDetailState(data) {
-  const back = document.createElement("button"); back.className = "person-detail-back"; back.type = "button";
-  back.textContent = "Back"; back.addEventListener("click", returnToMusicPeopleRoute);
   const panel = document.createElement("section"); panel.className = "person-detail-state"; panel.dataset.personDetailState = data.state;
   panel.setAttribute("role", "status");
   const title = document.createElement("h3"); title.id = "person-detail-title";
@@ -14376,7 +14385,7 @@ function renderMusicPersonDetailState(data) {
     });
     panel.append(retry);
   }
-  personDetail.replaceChildren(back, panel);
+  personDetail.replaceChildren(panel);
 }
 
 function getMusicPersonControlId(kind, target) {
@@ -14603,7 +14612,7 @@ function createMusicPersonLegacyShowGroup(shows, personName, options = {}) {
   metadata.hidden = !metadata.textContent;
   const count = document.createElement("span"); count.className = "person-legacy-show-count";
   count.id = getMusicPersonControlId("show-count", show.showId);
-  count.textContent = getMusicPersonLegacyPhotoSummary(shows);
+  count.textContent = getMusicPersonLegacyPhotoSummary(shows).replace(/\bVerified\s+/g, "");
   button.append(name, metadata, count);
   button.setAttribute("aria-labelledby", [name.id, metadata.id, count.id].join(" "));
   const actions = document.createElement("div"); actions.className = "person-legacy-show-links";
@@ -14672,7 +14681,6 @@ function renderMusicPersonDetail(data) {
   if (!same) musicPersonTaggedShowHydrationToken++;
   if (!same) {
     stopMusicPersonIdentityMotion();
-    const back = document.createElement("button"); back.type = "button"; back.className = "person-detail-back"; back.textContent = "Back"; back.addEventListener("click", returnToMusicPeopleRoute);
     const hero = document.createElement("section"); hero.className = "person-detail-hero"; hero.dataset.personNote = "";
     const kicker = document.createElement("p"); kicker.className = "person-detail-kicker"; kicker.textContent = "The Note";
     const signature = createMusicPeopleEchoNote(getMusicPeopleSignatureDescriptor(data));
@@ -14682,7 +14690,7 @@ function renderMusicPersonDetail(data) {
     copy.append(name, createMusicPersonPillList(data));
     if (data.aliases?.length) { const aliases = document.createElement("p"); aliases.className = "person-detail-aliases"; aliases.textContent = data.aliases.join(" · "); copy.append(aliases); }
     hero.append(kicker, signature, copy, createMusicPersonArchiveBlock(data.archiveRows));
-    personDetail.replaceChildren(back, hero); personDetail.dataset.personIdentity = data.personId;
+    personDetail.replaceChildren(hero); personDetail.dataset.personIdentity = data.personId;
 
   } else {
     const copy = personDetail.querySelector(".person-detail-copy");
